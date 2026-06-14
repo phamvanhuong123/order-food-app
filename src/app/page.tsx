@@ -1,7 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
-import { envConfig } from "../../config";
+import { envConfig } from "@/config";
 
 export default function Home() {
   console.log(envConfig.DB_USER)
