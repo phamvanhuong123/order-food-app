@@ -138,7 +138,7 @@ const request = async <Response>(
         const accessToken = headers.get("Authorization")?.split("Bearer ")[1];
         redirect(`/logout?accessToken=${accessToken}`);
       }
-      return
+
     }
     //Các trường hợp lỗi còn lại
     throw new HttpError(data as { status: number; payload: Payload });
