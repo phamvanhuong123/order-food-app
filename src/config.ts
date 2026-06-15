@@ -2,10 +2,12 @@ import { z } from "zod";
 
 const configSchema = z.object({
   DB_USER: z.string(),
+  NEXT_PUBLIC_API_ENDPOINT : z.string()
 });
 
 const configProject = configSchema.safeParse({
-    DB_USER : process.env.DB_USER
+    DB_USER : process.env.DB_USER,
+    NEXT_PUBLIC_API_ENDPOINT : process.env.NEXT_PUBLIC_API_ENDPOINT
 });
 
 if (!configProject.success){
