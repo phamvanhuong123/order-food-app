@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import {Inter } from "next/font/google";
 import "./globals.css";
+import { cn } from "@/lib/utils";
+import { ThemeProvider } from "@/components/theme-provider";
+import { Toaster } from "sonner";
 
 const interSans = Inter({
   variable: "--font-inter-sans",
@@ -23,7 +26,12 @@ export default function RootLayout({
       lang="en"
       className={`${interSans.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+        <body className={cn('min-h-screen bg-background font-sans antialiased', interSans.variable)}>
+        <ThemeProvider attribute='class' defaultTheme='system' enableSystem disableTransitionOnChange>
+          {children}
+          <Toaster />
+        </ThemeProvider>
+      </body>
     </html>
   );
 }
