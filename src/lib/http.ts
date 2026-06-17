@@ -14,21 +14,17 @@ type EntityErrorPayload = {
     message: string;
   }[];
 };
-type Payload = {
-  message: string;
-  [key: string]: unknown;
-};
 
 export class HttpError extends Error {
   status: number;
-  payload: Payload;
+  payload: EntityErrorPayload;
   constructor({
     status,
     payload,
     message = "Lỗi HTTP",
   }: {
     status: number;
-    payload: Payload;
+    payload: EntityErrorPayload;
     message?: string;
   }) {
     super(message);
@@ -141,12 +137,13 @@ const request = async <Response>(
 
     }
     //Các trường hợp lỗi còn lại
-    throw new HttpError(data as { status: number; payload: Payload });
+    throw new HttpError(data as { status: number; payload: EntityErrorPayload });
   }
 
   // Đảm bảo logic dưới đây chỉ chạy ở phía client (browser)
   if (isEnviromentClient) {
     const normalizeUrl = normalizePath(url)
+
     if (
       ['auth/login', 'auth/register'].some(
         (item) => item === normalizeUrl

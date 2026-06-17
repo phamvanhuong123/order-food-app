@@ -35,11 +35,17 @@ export async function POST(request: NextRequest) {
       sameSite: "lax",
       expires: decodeRefreshToken.exp * 1000,
     });
+   
     return Response.json(payload);
   } catch (error) {
+   
     if (error instanceof HttpError) {
+  
       return Response.json({
-        status: error.status,
+        message: error.message,
+        errors : error.payload.errors
+      }, {
+        status : error.status
       });
     }
     return Response.json(
