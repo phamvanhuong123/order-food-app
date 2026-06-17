@@ -41,3 +41,9 @@ export const handleErrorApi = <T extends FieldValues>({
     })
   }
 };
+
+
+//lấy token
+const isBrowser = typeof window !== 'undefined'
+export const getAccessTokenFromLocalStorage = () => isBrowser ? localStorage.getItem('accessToken') : null
+export const getRefreshTokenFromLocalStorage = () => isBrowser ? localStorage.getItem('refreshToken') : null

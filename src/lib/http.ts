@@ -143,9 +143,9 @@ const request = async <Response>(
   // Đảm bảo logic dưới đây chỉ chạy ở phía client (browser)
   if (isEnviromentClient) {
     const normalizeUrl = normalizePath(url)
-
+    console.log(normalizeUrl)
     if (
-      ['auth/login', 'auth/register'].some(
+      ['api/auth/login', 'api/auth/login'].some(
         (item) => item === normalizeUrl
       )
     ) {
