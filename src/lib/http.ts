@@ -143,16 +143,15 @@ const request = async <Response>(
   // Đảm bảo logic dưới đây chỉ chạy ở phía client (browser)
   if (isEnviromentClient) {
     const normalizeUrl = normalizePath(url)
-    console.log(normalizeUrl)
     if (
-      ['api/auth/login', 'api/auth/login'].some(
+      ['api/auth/login', 'auth/login'].some(
         (item) => item === normalizeUrl
       )
     ) {
       const { accessToken, refreshToken } = (payload as LoginResType).data
       localStorage.setItem('accessToken', accessToken)
       localStorage.setItem('refreshToken', refreshToken)
-    } else if ('auth/logout' === normalizeUrl) {
+    } else if ('/api/auth/logout' === normalizeUrl) {
       localStorage.removeItem('accessToken')
       localStorage.removeItem('refreshToken')
     }
