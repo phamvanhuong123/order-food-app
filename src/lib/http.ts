@@ -50,7 +50,6 @@ export class EntityError extends HttpError {
 
 let clientLogoutRequest: null | Promise<unknown> = null;
 const isEnviromentClient = typeof window !== "undefined";
-
 const request = async <Response>(
   method: "GET" | "POST" | "PUT" | "DELETE",
   url: string,
@@ -134,59 +133,58 @@ const request = async <Response>(
         const accessToken = headers.get("Authorization")?.split("Bearer ")[1];
         redirect(`/logout?accessToken=${accessToken}`);
       }
-
     }
     //Các trường hợp lỗi còn lại
-    throw new HttpError(data as { status: number; payload: EntityErrorPayload });
+    throw new HttpError(
+      data as { status: number; payload: EntityErrorPayload },
+    );
   }
-
   // Đảm bảo logic dưới đây chỉ chạy ở phía client (browser)
   if (isEnviromentClient) {
-    const normalizeUrl = normalizePath(url)
+    const normalizeUrl = normalizePath(url);
+
+
     if (
-      ['api/auth/login', 'auth/login'].some(
-        (item) => item === normalizeUrl
-      )
+      ["api/auth/login", "auth/login"].some((item) => item === normalizeUrl)
     ) {
-      const { accessToken, refreshToken } = (payload as LoginResType).data
-      localStorage.setItem('accessToken', accessToken)
-      localStorage.setItem('refreshToken', refreshToken)
-    } else if ('/api/auth/logout' === normalizeUrl) {
-      localStorage.removeItem('accessToken')
-      localStorage.removeItem('refreshToken')
+      const { accessToken, refreshToken } = (payload as LoginResType).data;
+      localStorage.setItem("accessToken", accessToken);
+      localStorage.setItem("refreshToken", refreshToken);
+    } else if ("api/auth/logout" === normalizeUrl) {
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
     }
   }
-  return data
+  return data;
 };
-
 
 const http = {
   get<Response>(
     url: string,
-    options?: Omit<CustomOptions, 'body'> | undefined
+    options?: Omit<CustomOptions, "body"> | undefined,
   ) {
-    return request<Response>('GET', url, options)
+    return request<Response>("GET", url, options);
   },
   post<Response>(
     url: string,
     body: any,
-    options?: Omit<CustomOptions, 'body'> | undefined
+    options?: Omit<CustomOptions, "body"> | undefined,
   ) {
-    return request<Response>('POST', url, { ...options, body })
+    return request<Response>("POST", url, { ...options, body });
   },
   put<Response>(
     url: string,
     body: any,
-    options?: Omit<CustomOptions, 'body'> | undefined
+    options?: Omit<CustomOptions, "body"> | undefined,
   ) {
-    return request<Response>('PUT', url, { ...options, body })
+    return request<Response>("PUT", url, { ...options, body });
   },
   delete<Response>(
     url: string,
-    options?: Omit<CustomOptions, 'body'> | undefined
+    options?: Omit<CustomOptions, "body"> | undefined,
   ) {
-    return request<Response>('DELETE', url, { ...options })
-  }
-}
+    return request<Response>("DELETE", url, { ...options });
+  },
+};
 
-export default http
+export default http;
