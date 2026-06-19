@@ -22,12 +22,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${interSans.variable} h-full antialiased`}>
+    <html lang="en" className={`${interSans.variable} h-full antialiased`} suppressHydrationWarning>
       <body
         className={cn(
           "min-h-screen bg-background font-sans antialiased",
           interSans.variable,
         )}
+        suppressHydrationWarning
       >
         <AppProvider>
           <ThemeProvider
