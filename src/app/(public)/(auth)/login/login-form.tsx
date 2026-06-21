@@ -100,7 +100,7 @@ export default function LoginForm() {
                 </Field>
               )}
             />
-            <Button type="submit" className="w-full">
+            <Button form="form-login" type="submit" className="w-full">
               Đăng nhập
             </Button>
             <Button

@@ -81,7 +81,7 @@ export type UpdateEmployeeAccountBodyType = z.TypeOf<typeof UpdateEmployeeAccoun
 export const UpdateMeBody = z
   .object({
     name: z.string().trim().min(2).max(256),
-    avatar: z.string().url().optional()
+    avatar: z.url().optional()
   })
   .strict()
 
@@ -89,9 +89,9 @@ export type UpdateMeBodyType = z.TypeOf<typeof UpdateMeBody>
 
 export const ChangePasswordBody = z
   .object({
-    oldPassword: z.string().min(6).max(100),
-    password: z.string().min(6).max(100),
-    confirmPassword: z.string().min(6).max(100)
+    oldPassword: z.string().min(6,{error : 'Tối thiểu là 6 kí tự'}).max(100,{error : 'Tối đa 100 kí tự'}),
+    password: z.string().min(6,{error : 'Tối thiểu là 6 kí tự'}).max(100,{error :'Tối đa 100 kí tự'}),
+    confirmPassword: z.string().min(6,{error : 'Tối thiểu là 6 kí tự'}).max(100,{error :'Tối đa 100 kí tự'})
   })
   .strict()
   .superRefine(({ confirmPassword, password }, ctx) => {
