@@ -13,6 +13,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Field, FieldError, FieldGroup } from "@/components/ui/field";
 import { toast } from "sonner";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useAccountProfile } from "@/queries/useAccountProfile";
 
 export default function UpdateProfileForm() {
   const form = useForm<UpdateMeBodyType>({
@@ -22,11 +24,36 @@ export default function UpdateProfileForm() {
       avatar: "",
     },
   });
-  const onSubmit = ()=> {
-    toast("Successful")
-  }
+  const { data } = useAccountProfile();
+  const inputAvataRef = useRef<HTMLInputElement>(null);
+  const avatar = form.getValues("avatar");
+  const [file, setFile] = useState<File | null>(null);
+  const previewAvatar = useMemo(() => {
+    if (file) {
+      const urlFileImage = URL.createObjectURL(file);
+      return urlFileImage;
+    }
+    return avatar;
+  }, [file, avatar]);
+  const onSubmit = () => {
+    toast("Successful");
+  };
+  useEffect(()=> {
+    if(data) {
+      const {name,avatar} = data.payload.data
+      form.reset({
+        name,
+        avatar : avatar ??''
+      })
+    }
+  },[data,form])
   return (
-    <form noValidate className="grid auto-rows-max items-start gap-4 md:gap-8" id="form-info-user" onSubmit={form.handleSubmit(onSubmit)}>
+    <form
+      noValidate
+      className="grid auto-rows-max items-start gap-4 md:gap-8"
+      id="form-info-user"
+      onSubmit={form.handleSubmit(onSubmit)}
+    >
       <Card x-chunk="dashboard-07-chunk-0">
         <CardHeader>
           <CardTitle>Thông tin cá nhân</CardTitle>
@@ -41,22 +68,34 @@ export default function UpdateProfileForm() {
                   <Field>
                     <div className="flex gap-2 items-start justify-start">
                       <Avatar className="aspect-square w-25 h-25 rounded-md object-cover">
-                        <AvatarImage src={"Duoc"} />
+                        <AvatarImage src={previewAvatar} />
                         <AvatarFallback className="rounded-none">
                           {"duoc"}
                         </AvatarFallback>
                       </Avatar>
-                      <input type="file" accept="image/*" className="hidden" />
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        ref={inputAvataRef}
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) setFile(file);
+                        }}
+                      />
                       <button
                         className="flex aspect-square w-25 items-center justify-center rounded-md border border-dashed"
                         type="button"
-                        
+                        onClick={() => {
+                          inputAvataRef.current?.click();
+                        }}
                       >
                         <Upload className="h-4 w-4 text-muted-foreground" />
                         <span className="sr-only">Upload</span>
                       </button>
-                         {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />)}
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
                     </div>
                   </Field>
                 )}
@@ -65,7 +104,7 @@ export default function UpdateProfileForm() {
               <Controller
                 control={form.control}
                 name="name"
-                render={({ field,fieldState }) => (
+                render={({ field, fieldState }) => (
                   <Field>
                     <div className="grid gap-3">
                       <Label htmlFor="name">Tên</Label>
@@ -75,8 +114,9 @@ export default function UpdateProfileForm() {
                         className="w-full"
                         {...field}
                       />
-                        {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />)}
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
                     </div>
                   </Field>
                 )}
