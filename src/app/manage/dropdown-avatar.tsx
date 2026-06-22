@@ -13,10 +13,10 @@ import Link from "next/link";
 import { useLogoutMutaition } from "@/queries/useAuth";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { useAccountProfile } from "@/queries/useAccountProfile";
+import { useAccountMe } from "@/queries/useAccountProfile";
 export default function DropdownAvatar() {
   const logoutMutaion = useLogoutMutaition();
-  const {data} = useAccountProfile()
+  const {data} = useAccountMe()
   const account = data?.payload.data
   const route = useRouter()
   const handleLogout = async () => {

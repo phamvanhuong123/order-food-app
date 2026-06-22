@@ -14,7 +14,9 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Field, FieldError, FieldGroup } from "@/components/ui/field";
 import { toast } from "sonner";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useAccountProfile } from "@/queries/useAccountProfile";
+import { useAccountMe, useUpdateAccountMe } from "@/queries/useAccountProfile";
+import { useUploadImage } from "@/queries/useMedia";
+import { handleErrorApi } from "@/lib/utils";
 
 export default function UpdateProfileForm() {
   const form = useForm<UpdateMeBodyType>({
@@ -24,20 +26,47 @@ export default function UpdateProfileForm() {
       avatar: "",
     },
   });
-  const { data } = useAccountProfile();
+  const { data } = useAccountMe();
+  const updateAccountMe = useUpdateAccountMe()
+  const uploadloadImage = useUploadImage()
   const inputAvataRef = useRef<HTMLInputElement>(null);
   const avatar = form.getValues("avatar");
   const [file, setFile] = useState<File | null>(null);
   const previewAvatar = useMemo(() => {
     if (file) {
       const urlFileImage = URL.createObjectURL(file);
+
       return urlFileImage;
     }
     return avatar;
-  }, [file, avatar]);
-  const onSubmit = () => {
-    toast("Successful");
+  }, [file,avatar]);
+  const onSubmit =async (values : UpdateMeBodyType) => {
+    if(updateAccountMe.isPending || !form.formState.isDirty) return
+    try{
+      let updateBody = {
+        ...values
+      }
+      if(file){
+        const formData = new FormData()
+        formData.append('file',file)
+        const imgageUrl = await uploadloadImage.mutateAsync(formData)
+        updateBody = {
+          ...updateBody,
+          avatar : imgageUrl.payload.data
+        }
+      }
+      await updateAccountMe.mutateAsync(updateBody)
+      toast.success("Cật nhật thông tin thành công", {duration : 2000})
+      setFile(null)
+    }
+    catch(error){
+      handleErrorApi({error,setError : form.setError})
+    }
   };
+  const onReset = ()=> {
+    form.reset()
+    setFile(null)
+  }
   useEffect(()=> {
     if(data) {
       const {name,avatar} = data.payload.data
@@ -52,7 +81,8 @@ export default function UpdateProfileForm() {
       noValidate
       className="grid auto-rows-max items-start gap-4 md:gap-8"
       id="form-info-user"
-      onSubmit={form.handleSubmit(onSubmit)}
+      onSubmit={form.handleSubmit(onSubmit, (e)=> {console.log(e)})}
+      onReset={onReset}
     >
       <Card x-chunk="dashboard-07-chunk-0">
         <CardHeader>
@@ -70,7 +100,7 @@ export default function UpdateProfileForm() {
                       <Avatar className="aspect-square w-25 h-25 rounded-md object-cover">
                         <AvatarImage src={previewAvatar} />
                         <AvatarFallback className="rounded-none">
-                          {"duoc"}
+                          {"Huong"}
                         </AvatarFallback>
                       </Avatar>
                       <input
@@ -80,7 +110,10 @@ export default function UpdateProfileForm() {
                         ref={inputAvataRef}
                         onChange={(e) => {
                           const file = e.target.files?.[0];
-                          if (file) setFile(file);
+                          if (file){
+                            setFile(file)
+                            field.onChange("https://temp-avatar.local")
+                          };
                         }}
                       />
                       <button
