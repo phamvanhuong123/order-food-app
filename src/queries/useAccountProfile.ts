@@ -1,23 +1,26 @@
-import { accountApiRequest } from "@/apiRequest/account"
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { accountApiRequest } from "@/apiRequest/account";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-export const useAccountMe = ()=> {
+export const useAccountMe = () => {
   return useQuery({
-    queryKey : ['account-me'],
-    queryFn : accountApiRequest.me
-  })
-}
+    queryKey: ["account-me"],
+    queryFn: accountApiRequest.me,
+  });
+};
 
-export const useUpdateAccountMe = ()=> {
-  const queryClient = useQueryClient()
-
-
+export const useUpdateAccountMe = () => {
+  const queryClient = useQueryClient();
   return useMutation({
-    mutationFn : accountApiRequest.updateMe,
-    onSuccess  : ()=> {
+    mutationFn: accountApiRequest.updateMe,
+    onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey : ['account-me']
-      })
-    }
-  })
-}
+        queryKey: ["account-me"],
+      });
+    },
+  });
+};
+export const useChangePasswordMe = () => {
+  return useMutation({
+    mutationFn: accountApiRequest.changePasswordMe,
+  });
+};
