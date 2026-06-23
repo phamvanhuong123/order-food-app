@@ -8,14 +8,15 @@ export async function POST() {
    const cookieStore = await cookies();
   const accessToken = cookieStore.get('accessToken')?.value
   const refreshToken = cookieStore.get('refreshToken')?.value
+    //clear cookie đi
+  cookieStore.delete('accessToken')
+  cookieStore.delete('refreshToken')
   if (!accessToken || !refreshToken) return  NextResponse.json({
     message : 'Không nhận được accessToken hoặc refreshToken'
   },{
     status : StatusCodes.OK
   })
-  //clear cookie đi
-  cookieStore.delete('accessToken')
-  cookieStore.delete('refreshToken')
+
   try{
     //Gọi api bên phía server
     const res = await authApiRequest.logOut( {accessToken,refreshToken})
