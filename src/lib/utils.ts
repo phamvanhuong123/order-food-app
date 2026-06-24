@@ -42,6 +42,15 @@ export const handleErrorApi = <T extends FieldValues>({
   }
 };
 
+export function isNextRedirect(error: unknown): boolean {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    "digest" in error &&
+    typeof error.digest === "string" &&
+    error.digest.startsWith("NEXT_REDIRECT")
+  );
+}
 
 //lấy token
 const isBrowser = typeof window !== 'undefined'
