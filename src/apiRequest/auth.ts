@@ -22,13 +22,17 @@ const logOut = async (
     accessToken: string;
   },
 ) => {
-  return http.post("auth/logout", {
-    refreshToken : body.refreshToken
-  },{
-    headers : {
-      Authorization : `Bearer ${body.accessToken}`
-    }
-  });
+  return http.post(
+    "auth/logout",
+    {
+      refreshToken: body.refreshToken,
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${body.accessToken}`,
+      },
+    },
+  );
 };
 
 //KHông cần truyền vì cho dù api có thất bại thì cũng logout
@@ -39,19 +43,31 @@ const sLogOut = async () => {
 };
 
 //refreshToken
-const refreshToken = (body : RefreshTokenBodyType) =>{
-  return http.post<RefreshTokenResType>('auth/refresh-token',body)
-}
-const sRefreshToken = () =>{
-  return http.post<RefreshTokenResType>('api/auth/refresh-token',null,{
-    baseUrl : ""
-  })
-}
+let refreshTokenRequest: Promise<{
+  status: number;
+  payload: RefreshTokenResType;
+}> | null;
+
+const refreshToken = (body: RefreshTokenBodyType) => {
+  return http.post<RefreshTokenResType>("auth/refresh-token", body);
+};
+const sRefreshToken =async () => {
+  if (refreshTokenRequest) {
+  
+    return refreshTokenRequest
+  }
+  refreshTokenRequest = http.post<RefreshTokenResType>("api/auth/refresh-token", null, {
+      baseUrl: "",
+    });
+  const result = await refreshTokenRequest
+  refreshTokenRequest = null
+  return result;
+};
 export const authApiRequest = {
   login,
   sLogin,
   logOut,
   sLogOut,
   refreshToken,
-  sRefreshToken
+  sRefreshToken,
 };

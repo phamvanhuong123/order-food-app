@@ -39,6 +39,7 @@ export async function POST(request: NextRequest) {
     return Response.json(payload);
     
   } catch (error) {
+    console.log(error)
     return Response.json({
       message : `Đã có lỗi xảy ra${error}`
      }, {

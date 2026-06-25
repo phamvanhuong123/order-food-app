@@ -56,3 +56,5 @@ export function isNextRedirect(error: unknown): boolean {
 const isBrowser = typeof window !== 'undefined'
 export const getAccessTokenFromLocalStorage = () => isBrowser ? localStorage.getItem('accessToken') : null
 export const getRefreshTokenFromLocalStorage = () => isBrowser ? localStorage.getItem('refreshToken') : null
+export const setAcessTokenToLocalStorage = (value : string) => isBrowser && localStorage.setItem("accessToken",value)
+export const setRefreshToLocalStorage = (value : string) => isBrowser && localStorage.setItem("refreshToken",value)
