@@ -3,6 +3,8 @@ import {
   LoginBodyType,
   LoginResType,
   LogoutBodyType,
+  RefreshTokenBodyType,
+  RefreshTokenResType,
 } from "@/modelValidation/auth.shema";
 
 //Login bên api server
@@ -35,9 +37,21 @@ const sLogOut = async () => {
     baseUrl: "",
   });
 };
+
+//refreshToken
+const refreshToken = (body : RefreshTokenBodyType) =>{
+  return http.post<RefreshTokenResType>('auth/refresh-token',body)
+}
+const sRefreshToken = () =>{
+  return http.post<RefreshTokenResType>('api/auth/refresh-token',null,{
+    baseUrl : ""
+  })
+}
 export const authApiRequest = {
   login,
   sLogin,
   logOut,
   sLogOut,
+  refreshToken,
+  sRefreshToken
 };
