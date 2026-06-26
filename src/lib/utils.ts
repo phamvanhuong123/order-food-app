@@ -1,9 +1,10 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
-import jwt from "jsonwebtoken";
+import jwt, { decode } from "jsonwebtoken";
 import { FieldValues, Path, UseFormSetError } from "react-hook-form";
 import { EntityError, HttpError } from "@/lib/http";
 import { toast } from "sonner";
+import { authApiRequest } from "@/apiRequest/auth";
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
@@ -58,3 +59,43 @@ export const getAccessTokenFromLocalStorage = () => isBrowser ? localStorage.get
 export const getRefreshTokenFromLocalStorage = () => isBrowser ? localStorage.getItem('refreshToken') : null
 export const setAcessTokenToLocalStorage = (value : string) => isBrowser && localStorage.setItem("accessToken",value)
 export const setRefreshToLocalStorage = (value : string) => isBrowser && localStorage.setItem("refreshToken",value)
+
+
+ export const checkRefreshToken = async (params? : {
+  onSuccess? : ()=> void,
+  onError? : ()=> void
+ }) => {
+        // console.log(pathName);
+        const acessTokenFromUrl = getAccessTokenFromLocalStorage();
+        const refreshTokenFromUrl = getRefreshTokenFromLocalStorage();
+        if (!acessTokenFromUrl || !refreshTokenFromUrl) return;
+        
+        //decode
+        const decodeAccessToken = decode(acessTokenFromUrl) as {
+          exp: number;
+          iat: number;
+        };
+  
+        const now = Math.round(Date.now() / 1000); // js tinh theo (ms) nên cần phải chia ra thành giây để đồng bộ với jwt
+  
+        //Nếu thời gian sử dụng của accesToken chỉ còn 1/3 thì refreshToken
+        //ví dụ thời hạn của accessToken là 10s thì khi thời hạn accessToken còn 3s thì gọi api refreshToken
+        if (
+          decodeAccessToken.exp - now <
+          (decodeAccessToken.exp - decodeAccessToken.iat) / 3
+        ) {
+          try {
+            const res = await authApiRequest.sRefreshToken();
+            const {
+              payload: { data },
+            } = res;
+            const { accessToken, refreshToken } = data;
+            setAcessTokenToLocalStorage(accessToken);
+            setRefreshToLocalStorage(refreshToken);
+            params?.onSuccess?.()
+          } catch (error) {
+            console.error(error);
+            params?.onError?.()
+          }
+        }
+      };

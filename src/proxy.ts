@@ -17,8 +17,9 @@ export async function proxy(request: NextRequest) {
     refreshToken &&
     privatePath.some((path) => pathname.startsWith(path))
   ) {
-    const url = new URL("/logout",request.url);
+    const url = new URL("/refresh-token",request.url);
     url.searchParams.set("refreshToken", refreshToken);
+    url.searchParams.set("redirect", pathname)
     return NextResponse.redirect(url);
   }
   if (refreshToken && unAuthPath.some((path) => pathname.startsWith(path)))

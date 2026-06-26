@@ -24,11 +24,7 @@ export function RefreshToken() {
       const acessTokenFromUrl = getAccessTokenFromLocalStorage();
       const refreshTokenFromUrl = getRefreshTokenFromLocalStorage();
       if (!acessTokenFromUrl || !refreshTokenFromUrl) return;
-
-      // const res = await authApiRequest.sRefreshToken()
-      // const {payload : {data}} =  res
-      // const {accessToken} = data
-
+      
       //decode
       const decodeAccessToken = decode(acessTokenFromUrl) as {
         exp: number;
