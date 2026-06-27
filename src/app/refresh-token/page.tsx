@@ -1,4 +1,5 @@
 'use client'
+import { Spinner } from "@/components/ui/spinner";
 import { checkRefreshToken, getRefreshTokenFromLocalStorage} from "@/lib/utils";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
@@ -22,5 +23,7 @@ export default function RefreshToken(){
       }
      
     }, [pathName,refreshTokenFormUrl,redirectPath,route]);
-  return null
+  return <div className="w-sreen h-screen flex items-center justify-center">
+    <Spinner className="size-15"/>
+  </div>;
 }

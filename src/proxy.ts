@@ -9,8 +9,12 @@ export async function proxy(request: NextRequest) {
   const refreshToken = request.cookies.get("refreshToken")?.value || "";
   const { pathname } = request.nextUrl;
   //Nếu chưa đăng nhập mà người dùng vào trang quản lí thì redirect về login
-  if (!refreshToken && privatePath.some((path) => pathname.startsWith(path)))
-    return NextResponse.redirect(new URL("/login", request.url));
+  if (!refreshToken && privatePath.some((path) => pathname.startsWith(path))){
+    const url = new URL("/login", request.url);
+    url.searchParams.set('clearTokens','true')
+    return NextResponse.redirect(url);
+  }
+    
   //Nếu accessToken hết hạn mà vẫn còn đăng nhập thì logout
   if (
     !accessToken &&
@@ -22,8 +26,12 @@ export async function proxy(request: NextRequest) {
     url.searchParams.set("redirect", pathname)
     return NextResponse.redirect(url);
   }
-  if (refreshToken && unAuthPath.some((path) => pathname.startsWith(path)))
+ 
+  if (refreshToken && unAuthPath.some((path) => pathname.startsWith(path))){
+     console.log(refreshToken)
     return NextResponse.redirect(new URL("/", request.url));
+  }
+  
 
   return NextResponse.next();
 }

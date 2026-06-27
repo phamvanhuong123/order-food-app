@@ -16,11 +16,16 @@ import { Field, FieldError } from "@/components/ui/field";
 import { useLoginMutaition } from "@/queries/useAuth";
 import { toast } from "sonner";
 import { handleErrorApi } from "@/lib/utils";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect } from "react";
+import { useAppContext } from "@/components/app-provider";
 
 export default function LoginForm() {
   const loginMutation = useLoginMutaition();
   const route = useRouter()
+  const searchParams = useSearchParams()
+  const {setIsAuth} = useAppContext()
+  const clearToken = searchParams.get('clearTokens')
   const form = useForm<LoginBodyType>({
     resolver: zodResolver(LoginBody),
     defaultValues: {
@@ -46,6 +51,9 @@ export default function LoginForm() {
       });
     }
   };
+  useEffect(()=>{
+    if(clearToken) setIsAuth(false)
+  },[setIsAuth,clearToken])
   return (
     <Card className="mx-auto max-w-sm w-150">
       <CardHeader>

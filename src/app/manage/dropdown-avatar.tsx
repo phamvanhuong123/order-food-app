@@ -14,9 +14,11 @@ import { useLogoutMutaition } from "@/queries/useAuth";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { useAccountMe } from "@/queries/useAccountProfile";
+import { useAppContext } from "@/components/app-provider";
 export default function DropdownAvatar() {
   const logoutMutaion = useLogoutMutaition();
   const {data} = useAccountMe()
+  const {setIsAuth} = useAppContext()
   const account = data?.payload.data
   const route = useRouter()
   const handleLogout = async () => {
@@ -24,11 +26,14 @@ export default function DropdownAvatar() {
     try {
       await logoutMutaion.mutateAsync()
       toast.success("Đăng xuất thành công", {duration : 2000})
-       route.push('/')
+      route.push('/')
+      
     } catch (error) {
       console.error(error);
       toast.error("Đang có vấn đề", {duration : 2000})
      
+    }finally{
+      setIsAuth(false)
     }
   };
   return (

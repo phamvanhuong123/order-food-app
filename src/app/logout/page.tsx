@@ -1,4 +1,6 @@
 "use client";
+import { useAppContext } from "@/components/app-provider";
+import { Spinner } from "@/components/ui/spinner";
 import {
   getAccessTokenFromLocalStorage,
   getRefreshTokenFromLocalStorage,
@@ -14,7 +16,7 @@ export default function LogoutPage() {
   const params = useSearchParams();
   const refreshTokenFormUrl = params.get("refreshToken");
   const accessTokenFormUrl = params.get("accessToken");
-  
+  const {setIsAuth} = useAppContext()
   useEffect(() => {
     const handleLogout = async () => {
       if (
@@ -26,12 +28,15 @@ export default function LogoutPage() {
       ref.current = mutateAsync;
       mutateAsync().then(() => {
         setTimeout(() => {
+          setIsAuth(false)
           route.push("/login");
         }, 1000);
       });
     };
     handleLogout();
-  }, [mutateAsync, route, refreshTokenFormUrl,accessTokenFormUrl]);
+  }, [mutateAsync, route, refreshTokenFormUrl,accessTokenFormUrl,setIsAuth]);
 
-  return <>Loading</>;
+  return <div className="w-screen h-screen flex items-center justify-center">
+    <Spinner className="size-15"/>
+  </div>;
 }
