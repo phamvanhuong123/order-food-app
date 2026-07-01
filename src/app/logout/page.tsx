@@ -7,10 +7,10 @@ import {
 } from "@/lib/utils";
 import { useLogoutMutaition } from "@/queries/useAuth";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useRef } from "react";
+import { Suspense, useEffect, useRef } from "react";
 
-export default function LogoutPage() {
-  const { mutateAsync } = useLogoutMutaition();
+function LogoutComponent(){
+const { mutateAsync } = useLogoutMutaition();
   const route = useRouter();
   const ref = useRef<unknown>(null);
   const params = useSearchParams();
@@ -39,4 +39,11 @@ export default function LogoutPage() {
   return <div className="w-screen h-screen flex items-center justify-center">
     <Spinner className="size-15"/>
   </div>;
+}
+
+
+export default function LogoutPage() {
+  return <Suspense>
+    <LogoutComponent/>
+  </Suspense>
 }

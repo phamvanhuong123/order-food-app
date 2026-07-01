@@ -2,11 +2,13 @@
 import { Spinner } from "@/components/ui/spinner";
 import { checkRefreshToken, getRefreshTokenFromLocalStorage} from "@/lib/utils";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 
 // const UNAUTHENTICATED_PATH = ["/login", "/logout", "/refresh-token"];
-export default function RefreshToken(){
-  const route = useRouter()
+
+
+function RefreshTokenComponent(){
+const route = useRouter()
   const pathName = usePathname()
   const params = useSearchParams()
   const refreshTokenFormUrl = params.get("refreshToken");
@@ -26,4 +28,9 @@ export default function RefreshToken(){
   return <div className="w-sreen h-screen flex items-center justify-center">
     <Spinner className="size-15"/>
   </div>;
+}
+export default function RefreshToken(){
+  return <Suspense>
+    <RefreshTokenComponent/>
+  </Suspense>
 }

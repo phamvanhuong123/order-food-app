@@ -17,11 +17,12 @@ import { useLoginMutaition } from "@/queries/useAuth";
 import { toast } from "sonner";
 import { handleErrorApi } from "@/lib/utils";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import { useAppContext } from "@/components/app-provider";
 
-export default function LoginForm() {
-  const loginMutation = useLoginMutaition();
+
+function LoginFormConponent() {
+   const loginMutation = useLoginMutaition();
   const route = useRouter()
   const searchParams = useSearchParams()
   const {setIsAuth} = useAppContext()
@@ -124,4 +125,11 @@ export default function LoginForm() {
       </CardContent>
     </Card>
   );
+}
+
+
+export default function LoginForm() {
+ return <Suspense>
+  <LoginFormConponent/>
+ </Suspense>
 }
