@@ -29,11 +29,11 @@ export type AccountResType = z.TypeOf<typeof AccountRes>
 
 export const CreateEmployeeAccountBody = z
   .object({
-    name: z.string().trim().min(2).max(256),
-    email: z.string().email(),
-    avatar: z.string().url().optional(),
-    password: z.string().min(6).max(100),
-    confirmPassword: z.string().min(6).max(100)
+    name: z.string().trim().min(2,{error : "Tối thiểu là 2 kí tự"}).max(256,{error : 'Tối đa là 256 kí tự'}),
+    email: z.email({error : "Email không hợp lệ"}),
+    avatar: z.url().optional(),
+    password: z.string().min(6,{error : "Mật khẩu tối thiểu là 6"}).max(100, {error : 'Mật khẩu tối đa là 100'}),
+    confirmPassword: z.string().min(6,{error : "Mật khẩu tối thiểu là 6"}).max(100, {error : 'Mật khẩu tối đa là 100'})
   })
   .strict()
   .superRefine(({ confirmPassword, password }, ctx) => {

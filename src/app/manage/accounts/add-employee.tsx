@@ -19,11 +19,17 @@ import { Controller, useForm } from 'react-hook-form'
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Field, FieldError } from '@/components/ui/field'
+import { useCreateAccountMutation } from '@/queries/useAccount'
+import { handleErrorApi } from '@/lib/utils'
+import { useUploadImage } from '@/queries/useMedia'
+import { toast } from 'sonner'
 
 export default function AddEmployee() {
   const [file, setFile] = useState<File | null>(null)
   const [open, setOpen] = useState(false)
   const avatarInputRef = useRef<HTMLInputElement | null>(null)
+  const createAccountMutation = useCreateAccountMutation()
+  const uploadloadImage = useUploadImage()
   const form = useForm<CreateEmployeeAccountBodyType>({
     resolver: zodResolver(CreateEmployeeAccountBody),
     defaultValues: {
@@ -43,6 +49,30 @@ export default function AddEmployee() {
     return avatar
   }, [file, avatar])
 
+  const onSubmit =async (values :CreateEmployeeAccountBodyType ) => {
+    if(createAccountMutation.isPending) return
+    try {
+      let createBody = {...values}
+      if(file){
+        const formData = new FormData()
+        formData.append('file',file)
+        const result = await uploadloadImage.mutateAsync(formData)
+        createBody = {
+          ...createBody,
+          avatar : result.payload.data,
+          
+        }
+      }
+      await createAccountMutation.mutateAsync(createBody)
+      toast.success("Cật nhật thông tin thành công", {duration : 2000})
+      setFile(null)
+      form.reset({})
+      setOpen(false)
+    } catch (error) {
+      handleErrorApi({error,setError : form.setError})
+
+    }
+  }
   return (
     <Dialog onOpenChange={setOpen} open={open}>
       <DialogTrigger asChild>
@@ -57,7 +87,7 @@ export default function AddEmployee() {
           <DialogDescription>Các trường tên, email, mật khẩu là bắt buộc</DialogDescription>
         </DialogHeader>
 
-          <form noValidate className='grid auto-rows-max items-start gap-4 md:gap-8' id='add-employee-form'>
+          <form noValidate className='grid auto-rows-max items-start gap-4 md:gap-8' id='add-employee-form' onSubmit={form.handleSubmit(onSubmit)}>
             <div className='grid gap-4 py-4'>
               <Controller
                 control={form.control}

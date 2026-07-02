@@ -61,7 +61,7 @@ export default function EditEmployee({
         }
       }}
     >
-      <DialogContent className='sm:max-w-[600px] max-h-screen overflow-auto'>
+      <DialogContent className='sm:max-w-150 max-h-screen overflow-auto'>
         <DialogHeader>
           <DialogTitle>Cập nhật tài khoản</DialogTitle>
           <DialogDescription>Các trường tên, email, mật khẩu là bắt buộc</DialogDescription>
@@ -100,6 +100,8 @@ export default function EditEmployee({
                         <span className='sr-only'>Upload</span>
                       </button>
                     </div>
+                     {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />)}
                   </Field>
                 )}
               />

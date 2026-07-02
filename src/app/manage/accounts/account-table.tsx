@@ -43,6 +43,7 @@ import {
 } from '@/components/ui/alert-dialog'
 import { useSearchParams } from 'next/navigation'
 import AutoPagination from '@/components/auto-pagination'
+import { useListEmployee } from '@/queries/useAccount'
 
 type AccountItem = AccountListResType['data'][0]
 
@@ -94,6 +95,7 @@ export const columns: ColumnDef<AccountType>[] = [
   },
   {
     id: 'actions',
+    header : 'Actions',
     enableHiding: false,
     cell: function Actions({ row }) {
       const { setEmployeeIdEdit, setEmployeeDelete } = useContext(AccountTableContext)
@@ -165,14 +167,15 @@ export default function AccountTable() {
   // const params = Object.fromEntries(searchParam.entries())
   const [employeeIdEdit, setEmployeeIdEdit] = useState<number | undefined>()
   const [employeeDelete, setEmployeeDelete] = useState<AccountItem | null>(null)
-  const data: any[] = []
+  const accountList = useListEmployee()
+  const data = accountList.data?.payload.data || []
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = useState({})
   const [pagination, setPagination] = useState({
-    pageIndex, // Gía trị mặc định ban đầu, không có ý nghĩa khi data được fetch bất đồng bộ
-    pageSize: PAGE_SIZE //default page size
+    pageIndex, 
+    pageSize: PAGE_SIZE 
   })
 
   const table = useReactTable({
