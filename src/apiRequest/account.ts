@@ -36,7 +36,7 @@ const createAccountEmployee = (body: CreateEmployeeAccountBodyType) => {
   return http.post<AccountResType>(`${prefix}/`, body);
 };
 const getDetailAccountEmployee = ({ id }: AccountIdParamType) => {
-  http.get<AccountResType>(`${prefix}/detail/${id}`);
+  return http.get<AccountResType>(`${prefix}/detail/${id}`);
 };
 const updateDetailAccountEmployee = (id : number,body : UpdateEmployeeAccountBodyType) => {
   return http.put<AccountResType>(`${prefix}/detail/${id}`,body)

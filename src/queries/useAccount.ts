@@ -15,6 +15,7 @@ export const useDetailEmployee = ({ id }: AccountIdParamType) => {
   return useQuery({
     queryKey: ["accounts", id],
     queryFn: () => accountApiRequest.getDetailAccountEmployee({ id }),
+    enabled : !!id
   });
 };
 export const useCreateAccountMutation = () => {
@@ -39,6 +40,7 @@ export const useUpdateAccountMutation = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["accounts"],
+        exact : true
       });
     },
   });

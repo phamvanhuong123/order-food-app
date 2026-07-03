@@ -64,7 +64,7 @@ export default function AddEmployee() {
         }
       }
       await createAccountMutation.mutateAsync(createBody)
-      toast.success("Cật nhật thông tin thành công", {duration : 2000})
+      toast.success("Thêm tài khoản thành công", {duration : 2000})
       setFile(null)
       form.reset({})
       setOpen(false)
