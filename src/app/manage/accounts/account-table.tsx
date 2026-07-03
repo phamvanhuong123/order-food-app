@@ -31,19 +31,20 @@ import AddEmployee from '@/app/manage/accounts/add-employee'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import EditEmployee from '@/app/manage/accounts/edit-employee'
 import { createContext, useContext, useEffect, useState } from 'react'
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle
-} from '@/components/ui/alert-dialog'
+// import {
+//   AlertDialog,
+//   AlertDialogAction,
+//   AlertDialogCancel,
+//   AlertDialogContent,
+//   AlertDialogDescription,
+//   AlertDialogFooter,
+//   AlertDialogHeader,
+//   AlertDialogTitle
+// } from '@/components/ui/alert-dialog'
 import { useSearchParams } from 'next/navigation'
 import AutoPagination from '@/components/auto-pagination'
 import { useListEmployee } from '@/queries/useAccount'
+import { AlertDialogDeleteAccount } from '@/app/manage/accounts/alert-dialog-delete-account'
 
 type AccountItem = AccountListResType['data'][0]
 
@@ -126,38 +127,38 @@ export const columns: ColumnDef<AccountType>[] = [
   }
 ]
 
-function AlertDialogDeleteAccount({
-  employeeDelete,
-  setEmployeeDelete
-}: {
-  employeeDelete: AccountItem | null
-  setEmployeeDelete: (value: AccountItem | null) => void
-}) {
-  return (
-    <AlertDialog
-      open={Boolean(employeeDelete)}
-      onOpenChange={(value) => {
-        if (!value) {
-          setEmployeeDelete(null)
-        }
-      }}
-    >
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>Xóa nhân viên?</AlertDialogTitle>
-          <AlertDialogDescription>
-            Tài khoản <span className='bg-foreground text-primary-foreground rounded px-1'>{employeeDelete?.name}</span>{' '}
-            sẽ bị xóa vĩnh viễn
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction>Continue</AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
-  )
-}
+// function AlertDialogDeleteAccount({
+//   employeeDelete,
+//   setEmployeeDelete
+// }: {
+//   employeeDelete: AccountItem | null
+//   setEmployeeDelete: (value: AccountItem | null) => void
+// }) {
+//   return (
+//     <AlertDialog
+//       open={Boolean(employeeDelete)}
+//       onOpenChange={(value) => {
+//         if (!value) {
+//           setEmployeeDelete(null)
+//         }
+//       }}
+//     >
+//       <AlertDialogContent>
+//         <AlertDialogHeader>
+//           <AlertDialogTitle>Xóa nhân viên?</AlertDialogTitle>
+//           <AlertDialogDescription>
+//             Tài khoản <span className='bg-foreground text-primary-foreground rounded px-1'>{employeeDelete?.name}</span>{' '}
+//             sẽ bị xóa vĩnh viễn
+//           </AlertDialogDescription>
+//         </AlertDialogHeader>
+//         <AlertDialogFooter>
+//           <AlertDialogCancel>Cancel</AlertDialogCancel>
+//           <AlertDialogAction>Continue</AlertDialogAction>
+//         </AlertDialogFooter>
+//       </AlertDialogContent>
+//     </AlertDialog>
+//   )
+// }
 // Số lượng item trên 1 trang
 const PAGE_SIZE = 10
 export default function AccountTable() {
