@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Upload } from "lucide-react";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getVietnameseDishStatus, handleErrorApi } from "@/lib/utils";
@@ -30,18 +30,23 @@ import {
 import { DishStatus, DishStatusValues } from "@/constants/type";
 import { Textarea } from "@/components/ui/textarea";
 import { Field, FieldError } from "@/components/ui/field";
+import { useDetailDish, useUpdateDishMutation } from "@/queries/useDish";
+import { useUploadImage } from "@/queries/useMedia";
+import { toast } from "sonner";
 
 export default function EditDish({
   id,
   setId,
-  onSubmitSuccess,
 }: {
   id?: number | undefined;
   setId: (value: number | undefined) => void;
-  onSubmitSuccess?: () => void;
 }) {
+
   const [file, setFile] = useState<File | null>(null);
   const imageInputRef = useRef<HTMLInputElement | null>(null);
+  const {data} = useDetailDish({id : id as number})
+  const updateDishMutation = useUpdateDishMutation()
+  const uploadloadImage = useUploadImage()
   const form = useForm<UpdateDishBodyType>({
     resolver: zodResolver(UpdateDishBody),
     defaultValues: {
@@ -60,12 +65,45 @@ export default function EditDish({
     }
     return image;
   }, [file, image]);
+  const reset = ()=> {
+    setFile(null)
+    setId(undefined)
+  }
+  const onSubmit = async(values : UpdateDishBodyType )=> {
+    if(updateDishMutation.isPending || uploadloadImage.isPending) return
+    try {
+      let updateBody = {...values}
+      if(file){
+        const formData = new FormData()
+        formData.append('file',file)
+        const urlImg = await  uploadloadImage.mutateAsync(formData)
+        updateBody = {...updateBody, image : urlImg.payload.data}
+      }
+      const result = await updateDishMutation.mutateAsync({id : id as number, ...updateBody})
+      toast.success(result.payload.message,{duration : 2000})
+      reset()
+    } catch (error) {
+      handleErrorApi({error,setError : form.setError})
+    }
+  }
+  useEffect(()=> {
+    if(data) {
+      const {name,image,price,description,status} = data.payload.data
+      form.reset({
+        name,
+        image,
+        price,
+        description,
+        status
+      })
+    }
+  },[data,form])
   return (
     <Dialog
       open={Boolean(id)}
       onOpenChange={(value) => {
         if (!value) {
-          setId(undefined);
+          reset()
         }
       }}
     >
@@ -81,6 +119,7 @@ export default function EditDish({
           noValidate
           className="grid auto-rows-max items-start gap-4 md:gap-8"
           id="edit-dish-form"
+          onSubmit={form.handleSubmit(onSubmit)}
         >
           <div className="grid gap-4 py-4">
             <Controller
@@ -196,7 +235,8 @@ export default function EditDish({
                     <div className="col-span-3 w-full space-y-2">
                       <Select
                         onValueChange={field.onChange}
-                        defaultValue={field.value}
+                        value={field.value}
+
                       >
                         <SelectTrigger>
                           <SelectValue placeholder="Chọn trạng thái" />

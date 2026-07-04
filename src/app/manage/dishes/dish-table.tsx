@@ -27,22 +27,14 @@ import { Input } from '@/components/ui/input'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { createContext, useContext, useEffect, useState } from 'react'
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle
-} from '@/components/ui/alert-dialog'
 import { formatCurrency, getVietnameseDishStatus } from '@/lib/utils'
 import { useSearchParams } from 'next/navigation'
 import AutoPagination from '@/components/auto-pagination'
 import { DishListResType } from '@/modelValidation/dish.schema'
 import EditDish from '@/app/manage/dishes/edit-dish'
 import AddDish from '@/app/manage/dishes/add-dish'
+import { useListDish } from '@/queries/useDish'
+import { AlertDialogDeleteDish } from '@/app/manage/dishes/alter-dialog-delete'
 
 type DishItem = DishListResType['data'][0]
 
@@ -99,6 +91,7 @@ export const columns: ColumnDef<DishItem>[] = [
   },
   {
     id: 'actions',
+    header : 'Actions',
     enableHiding: false,
     cell: function Actions({ row }) {
       const { setDishIdEdit, setDishDelete } = useContext(DishTableContext)
@@ -129,38 +122,6 @@ export const columns: ColumnDef<DishItem>[] = [
   }
 ]
 
-function AlertDialogDeleteDish({
-  dishDelete,
-  setDishDelete
-}: {
-  dishDelete: DishItem | null
-  setDishDelete: (value: DishItem | null) => void
-}) {
-  return (
-    <AlertDialog
-      open={Boolean(dishDelete)}
-      onOpenChange={(value) => {
-        if (!value) {
-          setDishDelete(null)
-        }
-      }}
-    >
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>Xóa món ăn?</AlertDialogTitle>
-          <AlertDialogDescription>
-            Món <span className='bg-foreground text-primary-foreground rounded px-1'>{dishDelete?.name}</span> sẽ bị xóa
-            vĩnh viễn
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction>Continue</AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
-  )
-}
 // Số lượng item trên 1 trang
 const PAGE_SIZE = 10
 export default function DishTable() {
@@ -169,7 +130,8 @@ export default function DishTable() {
   const pageIndex = page - 1
   const [dishIdEdit, setDishIdEdit] = useState<number | undefined>()
   const [dishDelete, setDishDelete] = useState<DishItem | null>(null)
-  const data: any[] = []
+  const result = useListDish()
+  const data = result.data?.payload.data || []
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})

@@ -1,5 +1,5 @@
 import http from "@/lib/http"
-import { CreateDishBodyType, DishListResType, UpdateDishBodyType } from "@/modelValidation/dish.schema"
+import { CreateDishBodyType, DishListResType, DishResType, UpdateDishBodyType } from "@/modelValidation/dish.schema"
 
 const prefix = '/dishes'
 
@@ -7,16 +7,16 @@ const getListDish = ()=> {
   return http.get<DishListResType>(`${prefix}/`)
 }
 const getDetailDish = (id : number ) => {
-    return http.get<DishListResType>(`${prefix}/${id}`)
+    return http.get<DishResType>(`${prefix}/${id}`)
 }
 const createDish = (body : CreateDishBodyType)=> {
-    return http.post<DishListResType>(`${prefix}/`,body)
+    return http.post<DishResType>(`${prefix}`,body)
 }
 const updateDish = (id : number,body : UpdateDishBodyType)=> {
-    return http.put<DishListResType>(`${prefix}/${id}`,body)
+    return http.put<DishResType>(`${prefix}/${id}`,body)
 }
 const deleteDish = (id : number ) => {
-    return http.delete<DishListResType>(`${prefix}/${id}`)
+    return http.delete<DishResType>(`${prefix}/${id}`)
 }
 export const dishApiRequest = {
   getListDish,

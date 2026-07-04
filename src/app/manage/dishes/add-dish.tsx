@@ -15,7 +15,7 @@ import { PlusCircle, Upload } from "lucide-react";
 import { useMemo, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { getVietnameseDishStatus } from "@/lib/utils";
+import { getVietnameseDishStatus, handleErrorApi } from "@/lib/utils";
 import {
   CreateDishBody,
   CreateDishBodyType,
@@ -30,11 +30,16 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Field, FieldError } from "@/components/ui/field";
+import { useCreateDishMutation } from "@/queries/useDish";
+import { useUploadImage } from "@/queries/useMedia";
+import { toast } from "sonner";
 
 export default function AddDish() {
   const [file, setFile] = useState<File | null>(null);
   const [open, setOpen] = useState(false);
   const imageInputRef = useRef<HTMLInputElement | null>(null);
+  const createDishMutation = useCreateDishMutation()
+  const uploadloadImage = useUploadImage()
   const form = useForm<CreateDishBodyType>({
     resolver: zodResolver(CreateDishBody),
     defaultValues: {
@@ -53,8 +58,24 @@ export default function AddDish() {
     }
     return image;
   }, [file, image]);
-  const onSubmit = (values: CreateDishBodyType) => {
+  const onSubmit = async(values: CreateDishBodyType) => {
     console.log(values);
+    if(createDishMutation.isPending || uploadloadImage.isPending) return
+    try {
+      let body = {...values}
+      if(file){
+        const formData = new FormData()
+        formData.append('file',file)
+        const urlImg = await  uploadloadImage.mutateAsync(formData)
+        body = {...body, image : urlImg.payload.data}
+      }
+      const result = await createDishMutation.mutateAsync(body)
+      toast.success(result.payload.message,{duration : 2000})
+      setFile(null)
+      form.reset({})
+    } catch (error) {
+      handleErrorApi({error, setError : form.setError})
+    }
   };
   return (
     <Dialog onOpenChange={setOpen} open={open}>

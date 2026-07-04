@@ -11,10 +11,13 @@ export const useListDish = ()=> {
 export const useDetailDish = ({id} : DishParamsType) => {
     return useQuery({
     queryKey : ['dishs',id],
-    queryFn :  () => dishApiRequest.getDetailDish(id)
+    queryFn :  () => dishApiRequest.getDetailDish(id),
+    enabled : !!id,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
   })
 }
-export const useCreateDish = ()=> {
+export const useCreateDishMutation = ()=> {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn : dishApiRequest.createDish,
@@ -25,19 +28,24 @@ export const useCreateDish = ()=> {
     }
   })
 }
-export const useUpdateDish = ()=> {
+export const useUpdateDishMutation = ()=> {
    const queryClient = useQueryClient()
   return useMutation({
     mutationFn : ({id,...updateData} : UpdateDishBodyType & {id : number} )=> dishApiRequest.updateDish(id,updateData),
-    onSuccess : ()=> {
+    onSuccess : (_, variables)=> {
       queryClient.invalidateQueries({
         queryKey : ['dishs'],
         exact : true
       })
+       queryClient.invalidateQueries({
+        queryKey : ['dishs',variables.id],
+        
+        
+      })
     }
   })
 }
-export const useDeleteAccountMutation = ()=> {
+export const useDeleteDishMutation = ()=> {
   const queryClient =  useQueryClient()
   return useMutation({
     mutationFn : ({id} : DishParamsType)=> dishApiRequest.deleteDish(id),

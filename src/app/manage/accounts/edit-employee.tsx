@@ -71,7 +71,7 @@ export default function EditEmployee({
     setId(undefined);
   };
   const onSubmit = async (values: UpdateEmployeeAccountBodyType) => {
-    if (updateAccountMutation.isPending) return;
+    if (updateAccountMutation.isPending || uploadloadImage.isPending) return;
     try {
       let updateBody = { ...values };
       if (file) {

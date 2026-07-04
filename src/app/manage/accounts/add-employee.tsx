@@ -50,7 +50,7 @@ export default function AddEmployee() {
   }, [file, avatar])
 
   const onSubmit =async (values :CreateEmployeeAccountBodyType ) => {
-    if(createAccountMutation.isPending) return
+    if(createAccountMutation.isPending || uploadloadImage.isPending) return
     try {
       let createBody = {...values}
       if(file){
