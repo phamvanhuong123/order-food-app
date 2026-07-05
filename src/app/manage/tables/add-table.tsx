@@ -14,7 +14,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { PlusCircle } from "lucide-react";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { getVietnameseTableStatus } from "@/lib/utils";
+import { getVietnameseTableStatus, handleErrorApi } from "@/lib/utils";
 import {
   CreateTableBody,
   CreateTableBodyType,
@@ -28,9 +28,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Field, FieldError } from "@/components/ui/field";
+import { useCreateTableMutation } from "@/queries/useTable";
+import { toast } from "sonner";
 
 export default function AddTable() {
   const [open, setOpen] = useState(false);
+  const createTableMutation = useCreateTableMutation()
   const form = useForm<CreateTableBodyType>({
     resolver: zodResolver(CreateTableBody),
     defaultValues: {
@@ -39,6 +42,22 @@ export default function AddTable() {
       status: TableStatus.Hidden,
     },
   });
+  const onSubmit =async (values : CreateTableBodyType)=>{
+    console.log(values)
+    if(createTableMutation.isPending) return
+    try {
+      const res = await createTableMutation.mutateAsync(values)
+      toast.success(res.payload.message,{duration : 2000})
+      form.reset({
+        number: 0,
+        capacity: 2,
+        status: TableStatus.Hidden
+      })
+      setOpen(false)
+    } catch (error) {
+      handleErrorApi({error,setError : form.setError})
+    }
+  }
   return (
     <Dialog onOpenChange={setOpen} open={open}>
       <DialogTrigger asChild>
@@ -52,6 +71,7 @@ export default function AddTable() {
       <DialogContent
         className="sm:max-w-150 max-h-screen overflow-auto"
         onCloseAutoFocus={() => form.reset()}
+        aria-describedby='undefined'
       >
         <DialogHeader>
           <DialogTitle>Thêm bàn</DialogTitle>
@@ -61,6 +81,7 @@ export default function AddTable() {
           noValidate
           className="grid auto-rows-max items-start gap-4 md:gap-8"
           id="add-table-form"
+          onSubmit={form.handleSubmit(onSubmit)}
         >
           <div className="grid gap-4 py-4">
             <Controller

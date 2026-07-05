@@ -1,5 +1,8 @@
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
+import { handleErrorApi } from "@/lib/utils"
 import { TableListResType } from "@/modelValidation/table.schema"
+import { useDeleteTableMutation } from "@/queries/useTable"
+import { toast } from "sonner"
 
 type TableItem = TableListResType['data'][0]
  export function AlertDialogDeleteTable({
@@ -9,6 +12,17 @@ type TableItem = TableListResType['data'][0]
   tableDelete: TableItem | null
   setTableDelete: (value: TableItem | null) => void
 }) {
+  const deleteTableMutation = useDeleteTableMutation(tableDelete?.number as number)
+  const onDelete =async ()=>{
+    try {
+      const res= await deleteTableMutation.mutateAsync()
+      toast.success(res.payload.message,{duration : 2000})
+      setTableDelete(null)
+
+    } catch (error) {
+      handleErrorApi({error})
+    }
+  }
   return (
     <AlertDialog
       open={Boolean(tableDelete)}
@@ -28,7 +42,7 @@ type TableItem = TableListResType['data'][0]
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction>Continue</AlertDialogAction>
+          <AlertDialogAction onClick={onDelete}>Continue</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

@@ -12,7 +12,9 @@ export const useDetailTable = (number : number)=> {
   return useQuery({
     queryKey : ['tables',number],
     queryFn : ()=> tableApiRequest.detail(number),
-    enabled : !!number
+    enabled : !!number,
+     staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
   })
 }
 export const useCreateTableMutation= ()=> {

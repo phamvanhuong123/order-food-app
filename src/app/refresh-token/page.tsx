@@ -4,7 +4,7 @@ import { checkRefreshToken, getRefreshTokenFromLocalStorage} from "@/lib/utils";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect } from "react";
 
-// const UNAUTHENTICATED_PATH = ["/login", "/logout", "/refresh-token"];
+const UNAUTHENTICATED_PATH = ["/login", "/logout", "/"];
 
 
 function RefreshTokenComponent(){
@@ -13,8 +13,9 @@ const route = useRouter()
   const params = useSearchParams()
   const refreshTokenFormUrl = params.get("refreshToken");
   const redirectPath = params.get('redirect')
+  console.log(refreshTokenFormUrl)
     useEffect(() => {
-      // if (UNAUTHENTICATED_PATH.includes(pathName)) return;
+      if (UNAUTHENTICATED_PATH.includes(pathName)) return;
 
       if(refreshTokenFormUrl && refreshTokenFormUrl === getRefreshTokenFromLocalStorage()){
          checkRefreshToken({

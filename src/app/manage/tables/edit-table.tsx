@@ -11,7 +11,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import { getTableLink, getVietnameseTableStatus } from "@/lib/utils";
+import {
+  getTableLink,
+  getVietnameseTableStatus,
+  handleErrorApi,
+} from "@/lib/utils";
 import {
   Select,
   SelectContent,
@@ -28,11 +32,14 @@ import { Switch } from "@/components/ui/switch";
 import Link from "next/link";
 import { Controller, useForm } from "react-hook-form";
 import { Field, FieldError } from "@/components/ui/field";
+import { useDetailTable, useUpdateTableMutation } from "@/queries/useTable";
+import { useEffect } from "react";
+import QRCodeTable from "@/components/QRCodeTable";
+import { toast } from "sonner";
 
 export default function EditTable({
   id,
   setId,
-
 }: {
   id?: number | undefined;
   setId: (value: number | undefined) => void;
@@ -45,8 +52,37 @@ export default function EditTable({
       changeToken: false,
     },
   });
-  const tableNumber = 0;
+  const { data } = useDetailTable(id as number);
+  const updateTableMutation = useUpdateTableMutation();
+  const reset = () => {
+    form.reset();
+    setId(undefined);
+  };
 
+  const onSubmit = async (values: UpdateTableBodyType) => {
+    if (updateTableMutation.isPending) return;
+
+    try {
+      const res = await updateTableMutation.mutateAsync({
+        number: id!,
+        ...values,
+      });
+      toast.success(res.payload.message);
+      reset();
+    } catch (error) {
+      handleErrorApi({ error, setError: form.setError });
+    }
+  };
+  useEffect(() => {
+    if (data) {
+      const { capacity, status } = data.payload.data;
+      form.reset({
+        capacity,
+        status,
+        changeToken: form.getValues("changeToken"),
+      });
+    }
+  }, [form, data]);
   return (
     <Dialog
       open={Boolean(id)}
@@ -58,9 +94,9 @@ export default function EditTable({
     >
       <DialogContent
         className="sm:max-w-150 max-h-screen overflow-auto"
+        aria-describedby={undefined}
         onCloseAutoFocus={() => {
-          form.reset();
-          setId(undefined);
+          reset();
         }}
       >
         <DialogHeader>
@@ -71,6 +107,7 @@ export default function EditTable({
           noValidate
           className="grid auto-rows-max items-start gap-4 md:gap-8"
           id="edit-table-form"
+          onSubmit={form.handleSubmit(onSubmit)}
         >
           <div className="grid gap-4 py-4">
             <Field>
@@ -81,7 +118,7 @@ export default function EditTable({
                     id="number"
                     type="number"
                     className="w-full"
-                    value={tableNumber}
+                    value={data?.payload.data.number ?? 0}
                     readOnly
                   />
                   {/* <FormMessage /> */}
@@ -102,7 +139,7 @@ export default function EditTable({
                         {...field}
                         type="number"
                         value={field.value}
-                        onChange={e => field.onChange(e.target.valueAsNumber)}
+                        onChange={(e) => field.onChange(e.target.valueAsNumber)}
                       />
                       {fieldState.invalid && (
                         <FieldError errors={[fieldState.error]} />
@@ -115,7 +152,7 @@ export default function EditTable({
             <Controller
               control={form.control}
               name="status"
-              render={({ field,fieldState }) => (
+              render={({ field, fieldState }) => (
                 <Field>
                   <div className="grid grid-cols-4 items-center justify-items-start gap-4">
                     <Label htmlFor="description">Trạng thái</Label>
@@ -138,9 +175,9 @@ export default function EditTable({
                       </Select>
                     </div>
 
-                      {fieldState.invalid && (
-                        <FieldError errors={[fieldState.error]} />
-                      )}
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
                   </div>
                 </Field>
               )}
@@ -148,7 +185,7 @@ export default function EditTable({
             <Controller
               control={form.control}
               name="changeToken"
-              render={({ field ,fieldState}) => (
+              render={({ field, fieldState }) => (
                 <Field>
                   <div className="grid grid-cols-4 items-center justify-items-start gap-4">
                     <Label htmlFor="price">Đổi QR Code</Label>
@@ -162,9 +199,9 @@ export default function EditTable({
                       </div>
                     </div>
 
-                       {fieldState.invalid && (
-                        <FieldError errors={[fieldState.error]} />
-                      )}
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
                   </div>
                 </Field>
               )}
@@ -172,7 +209,13 @@ export default function EditTable({
             <Field>
               <div className="grid grid-cols-4 items-center justify-items-start gap-4">
                 <Label>QR Code</Label>
-                <div className="col-span-3 w-full space-y-2"></div>
+                <div className="col-span-3 w-full space-y-2">
+                  <QRCodeTable
+                    tableNumber={data?.payload.data.number || 0}
+                    token={data?.payload.data.token || "error"}
+                    width={160}
+                  />
+                </div>
               </div>
             </Field>
             <Field>
@@ -181,15 +224,15 @@ export default function EditTable({
                 <div className="col-span-3 w-full space-y-2">
                   <Link
                     href={getTableLink({
-                      token: "123123123",
-                      tableNumber: tableNumber,
+                      token: data?.payload.data.token || "error",
+                      tableNumber: data?.payload.data.number || 0,
                     })}
                     target="_blank"
                     className="break-all"
                   >
                     {getTableLink({
-                      token: "123123123",
-                      tableNumber: tableNumber,
+                      token: data?.payload.data.token || "error",
+                      tableNumber: data?.payload.data.number || 0,
                     })}
                   </Link>
                 </div>
