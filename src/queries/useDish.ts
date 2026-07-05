@@ -5,13 +5,13 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 export const useListDish = ()=> {
   return useQuery({
     queryKey : ['dishs'],
-    queryFn :  dishApiRequest.getListDish
+    queryFn :  dishApiRequest.list
   })
 }
 export const useDetailDish = ({id} : DishParamsType) => {
     return useQuery({
     queryKey : ['dishs',id],
-    queryFn :  () => dishApiRequest.getDetailDish(id),
+    queryFn :  () => dishApiRequest.detail(id),
     enabled : !!id,
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
@@ -20,7 +20,7 @@ export const useDetailDish = ({id} : DishParamsType) => {
 export const useCreateDishMutation = ()=> {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn : dishApiRequest.createDish,
+    mutationFn : dishApiRequest.create,
     onSuccess : ()=> { 
       queryClient.invalidateQueries({
         queryKey : ['dishs']
@@ -31,7 +31,7 @@ export const useCreateDishMutation = ()=> {
 export const useUpdateDishMutation = ()=> {
    const queryClient = useQueryClient()
   return useMutation({
-    mutationFn : ({id,...updateData} : UpdateDishBodyType & {id : number} )=> dishApiRequest.updateDish(id,updateData),
+    mutationFn : ({id,...updateData} : UpdateDishBodyType & {id : number} )=> dishApiRequest.update(id,updateData),
     onSuccess : (_, variables)=> {
       queryClient.invalidateQueries({
         queryKey : ['dishs'],
@@ -48,7 +48,7 @@ export const useUpdateDishMutation = ()=> {
 export const useDeleteDishMutation = ()=> {
   const queryClient =  useQueryClient()
   return useMutation({
-    mutationFn : ({id} : DishParamsType)=> dishApiRequest.deleteDish(id),
+    mutationFn : ({id} : DishParamsType)=> dishApiRequest.remove(id),
     onSuccess : ()=> {
       queryClient.invalidateQueries({
         queryKey : ['dishs']

@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { authApiRequest } from "@/apiRequest/auth";
 import { DishStatus, OrderStatus, TableStatus } from "@/constants/type";
 import { BookX, CookingPot, HandCoins, Loader, Truck } from "lucide-react";
+import { envConfig } from "@/config";
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
@@ -157,9 +158,9 @@ export const getVietnameseTableStatus = (status: (typeof TableStatus)[keyof type
   }
 }
 
-// export const getTableLink = ({ token, tableNumber }: { token: string; tableNumber: number }) => {
-//   return envConfig.NEXT_PUBLIC_URL + '/tables/' + tableNumber + '?token=' + token
-// }
+export const getTableLink = ({ token, tableNumber }: { token: string; tableNumber: number }) => {
+  return envConfig.NEXT_PUBLIC_URL + '/tables/' + tableNumber + '?token=' + token
+}
 
 // export const decodeToken = (token: string) => {
 //   return jwt.decode(token) as TokenPayload

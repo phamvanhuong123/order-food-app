@@ -3,25 +3,25 @@ import { CreateDishBodyType, DishListResType, DishResType, UpdateDishBodyType } 
 
 const prefix = '/dishes'
 
-const getListDish = ()=> {
+const list = ()=> {
   return http.get<DishListResType>(`${prefix}/`)
 }
-const getDetailDish = (id : number ) => {
+const detail = (id : number ) => {
     return http.get<DishResType>(`${prefix}/${id}`)
 }
-const createDish = (body : CreateDishBodyType)=> {
+const create = (body : CreateDishBodyType)=> {
     return http.post<DishResType>(`${prefix}`,body)
 }
-const updateDish = (id : number,body : UpdateDishBodyType)=> {
+const update = (id : number,body : UpdateDishBodyType)=> {
     return http.put<DishResType>(`${prefix}/${id}`,body)
 }
-const deleteDish = (id : number ) => {
+const remove = (id : number ) => {
     return http.delete<DishResType>(`${prefix}/${id}`)
 }
 export const dishApiRequest = {
-  getListDish,
-  createDish,
-  getDetailDish,
-  updateDish,
-  deleteDish
+  list,
+  create,
+  detail,
+  update,
+  remove
 }
