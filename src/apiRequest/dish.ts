@@ -4,7 +4,7 @@ import { CreateDishBodyType, DishListResType, DishResType, UpdateDishBodyType } 
 const prefix = '/dishes'
 
 const list = ()=> {
-  return http.get<DishListResType>(`${prefix}/`)
+  return http.get<DishListResType>(`${prefix}/`,{ next: { tags: ['dishes'] } })
 }
 const detail = (id : number ) => {
     return http.get<DishResType>(`${prefix}/${id}`)

@@ -33,6 +33,7 @@ import { Field, FieldError } from "@/components/ui/field";
 import { useCreateDishMutation } from "@/queries/useDish";
 import { useUploadImage } from "@/queries/useMedia";
 import { toast } from "sonner";
+import { revalidateApiRequest } from "@/apiRequest/revalidate";
 
 export default function AddDish() {
   const [file, setFile] = useState<File | null>(null);
@@ -70,6 +71,7 @@ export default function AddDish() {
         body = {...body, image : urlImg.payload.data}
       }
       const result = await createDishMutation.mutateAsync(body)
+      await revalidateApiRequest('dishes')
       toast.success(result.payload.message,{duration : 2000})
       setFile(null)
       form.reset({})

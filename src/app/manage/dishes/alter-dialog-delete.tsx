@@ -1,3 +1,4 @@
+import { revalidateApiRequest } from "@/apiRequest/revalidate"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
 import { handleErrorApi } from "@/lib/utils"
 import { DishListResType } from "@/modelValidation/dish.schema"
@@ -17,6 +18,8 @@ export function AlertDialogDeleteDish({
     try{
       if(dishDelete?.id){
         const result = await mutateAsync({id : dishDelete.id as number})
+        await revalidateApiRequest('dishes')
+        
         toast.success(result.payload.message,{duration : 2000})
         setDishDelete(null)
       }

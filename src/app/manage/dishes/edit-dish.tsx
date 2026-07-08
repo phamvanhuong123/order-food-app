@@ -33,6 +33,7 @@ import { Field, FieldError } from "@/components/ui/field";
 import { useDetailDish, useUpdateDishMutation } from "@/queries/useDish";
 import { useUploadImage } from "@/queries/useMedia";
 import { toast } from "sonner";
+import { revalidateApiRequest } from "@/apiRequest/revalidate";
 
 export default function EditDish({
   id,
@@ -80,6 +81,8 @@ export default function EditDish({
         updateBody = {...updateBody, image : urlImg.payload.data}
       }
       const result = await updateDishMutation.mutateAsync({id : id as number, ...updateBody})
+      await revalidateApiRequest('dishes')
+      
       toast.success(result.payload.message,{duration : 2000})
       reset()
     } catch (error) {
@@ -111,7 +114,7 @@ export default function EditDish({
         <DialogHeader>
           <DialogTitle>Cập nhật món ăn</DialogTitle>
           <DialogDescription>
-            Các trường sau đây là bắ buộc: Tên, ảnh
+            Các trường sau đây là bắt buộc: Tên, ảnh
           </DialogDescription>
         </DialogHeader>
 

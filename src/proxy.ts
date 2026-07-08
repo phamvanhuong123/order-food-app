@@ -28,7 +28,6 @@ export async function proxy(request: NextRequest) {
   }
  
   if (refreshToken && unAuthPath.some((path) => pathname.startsWith(path))){
-     console.log(refreshToken)
     return NextResponse.redirect(new URL("/", request.url));
   }
   
