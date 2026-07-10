@@ -8,6 +8,8 @@ import { authApiRequest } from "@/apiRequest/auth";
 import { DishStatus, OrderStatus, TableStatus } from "@/constants/type";
 import { BookX, CookingPot, HandCoins, Loader, Truck } from "lucide-react";
 import { envConfig } from "@/config";
+import { TokenPayload } from "@/types/jwt.types";
+import { cookies } from "next/headers";
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
@@ -67,13 +69,12 @@ export const setAcessTokenToLocalStorage = (value: string) =>
 export const setRefreshToLocalStorage = (value: string) =>
   isBrowser && localStorage.setItem("refreshToken", value);
 
-export const removeTokenFromLocalStorage = ()=> {
-  if(isBrowser){
-    localStorage.removeItem('accessToken')
-    localStorage.removeItem('refreshToken')
+export const removeTokenFromLocalStorage = () => {
+  if (isBrowser) {
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
   }
-}
-
+};
 
 export const checkRefreshToken = async (params?: {
   onSuccess?: () => void;
@@ -113,58 +114,71 @@ export const checkRefreshToken = async (params?: {
   }
 };
 
-
 export const formatCurrency = (number: number) => {
-  return new Intl.NumberFormat('vi-VN', {
-    style: 'currency',
-    currency: 'VND'
-  }).format(number)
-}
+  return new Intl.NumberFormat("vi-VN", {
+    style: "currency",
+    currency: "VND",
+  }).format(number);
+};
 
-export const getVietnameseDishStatus = (status: (typeof DishStatus)[keyof typeof DishStatus]) => {
+export const getVietnameseDishStatus = (
+  status: (typeof DishStatus)[keyof typeof DishStatus],
+) => {
   switch (status) {
     case DishStatus.Available:
-      return 'Có sẵn'
+      return "Có sẵn";
     case DishStatus.Unavailable:
-      return 'Không có sẵn'
+      return "Không có sẵn";
     default:
-      return 'Ẩn'
+      return "Ẩn";
   }
-}
+};
 
-export const getVietnameseOrderStatus = (status: (typeof OrderStatus)[keyof typeof OrderStatus]) => {
+export const getVietnameseOrderStatus = (
+  status: (typeof OrderStatus)[keyof typeof OrderStatus],
+) => {
   switch (status) {
     case OrderStatus.Delivered:
-      return 'Đã phục vụ'
+      return "Đã phục vụ";
     case OrderStatus.Paid:
-      return 'Đã thanh toán'
+      return "Đã thanh toán";
     case OrderStatus.Pending:
-      return 'Chờ xử lý'
+      return "Chờ xử lý";
     case OrderStatus.Processing:
-      return 'Đang nấu'
+      return "Đang nấu";
     default:
-      return 'Từ chối'
+      return "Từ chối";
   }
-}
+};
 
-export const getVietnameseTableStatus = (status: (typeof TableStatus)[keyof typeof TableStatus]) => {
+export const getVietnameseTableStatus = (
+  status: (typeof TableStatus)[keyof typeof TableStatus],
+) => {
   switch (status) {
     case TableStatus.Available:
-      return 'Có sẵn'
+      return "Có sẵn";
     case TableStatus.Reserved:
-      return 'Đã đặt'
+      return "Đã đặt";
     default:
-      return 'Ẩn'
+      return "Ẩn";
   }
-}
+};
 
-export const getTableLink = ({ token, tableNumber }: { token: string; tableNumber: number }) => {
-  return envConfig.NEXT_PUBLIC_URL + '/tables/' + tableNumber + '?token=' + token
-}
+export const getTableLink = ({
+  token,
+  tableNumber,
+}: {
+  token: string;
+  tableNumber: number;
+}) => {
+  return (
+    envConfig.NEXT_PUBLIC_URL + "/tables/" + tableNumber + "?token=" + token
+  );
+};
 
-// export const decodeToken = (token: string) => {
-//   return jwt.decode(token) as TokenPayload
-// }
+export const decodeToken = (token: string) => {
+  return jwt.decode(token) as TokenPayload;
+};
 
 // export function removeAccents(str: string) {
 //   return str
@@ -191,5 +205,38 @@ export const OrderStatusIcon = {
   [OrderStatus.Processing]: CookingPot,
   [OrderStatus.Rejected]: BookX,
   [OrderStatus.Delivered]: Truck,
-  [OrderStatus.Paid]: HandCoins
-}
+  [OrderStatus.Paid]: HandCoins,
+};
+
+export const setAccesTokenToCookie = async ({
+  accessToken,
+  exp,
+}: {
+  accessToken: string;
+  exp: number;
+}) => {
+  const cookiesStore = await cookies();
+  cookiesStore.set("accessToken", accessToken, {
+    path: "/",
+    httpOnly: true,
+    secure: true,
+    sameSite: "lax",
+    expires: exp * 1000,
+  });
+};
+export const setRefreshTokenToCookie = async ({
+  refreshToken,
+  exp,
+}: {
+  refreshToken: string;
+  exp: number;
+}) => {
+  const cookiesStore = await cookies();
+  cookiesStore.set("refreshToken", refreshToken, {
+    path: "/",
+    httpOnly: true,
+    secure: true,
+    sameSite: "lax",
+    expires: exp * 1000,
+  });
+};

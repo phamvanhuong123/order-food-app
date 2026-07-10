@@ -1,0 +1,61 @@
+import { guestApiRequest } from "@/apiRequest/guest";
+import { HttpError } from "@/lib/http";
+import { setAccesTokenToCookie, setRefreshTokenToCookie } from "@/lib/utils";
+import { GuestLoginBodyType } from "@/modelValidation/guest.schema";
+import { TokenPayload } from "@/types/jwt.types";
+import { StatusCodes } from "http-status-codes";
+import { decode } from "jsonwebtoken";
+import { cookies } from "next/headers";
+import { NextRequest } from "next/server";
+
+export async function POST(request: NextRequest) {
+  const body = (await request.json()) as GuestLoginBodyType;
+  const cookiesStore = await cookies();
+  try {
+    const { payload } = await guestApiRequest.login(body);
+    const {
+      data: { accessToken, refreshToken },
+    } = payload;
+    //decode Token
+    const decodeAccessToken = decode(accessToken) as TokenPayload
+    const decodeRefreshToken = decode(refreshToken) as TokenPayload
+
+    //Set cookie
+    setAccesTokenToCookie({accessToken,exp :  decodeAccessToken.exp})
+    setRefreshTokenToCookie({refreshToken,exp :decodeRefreshToken.exp})
+    // cookiesStore.set("accessToken", accessToken, {
+    //   path: "/",
+    //   httpOnly: true,
+    //   secure: true,
+    //   sameSite: "lax",
+    //   expires: decodeAccessToken.exp * 1000,
+    // });
+
+    // cookiesStore.set("refreshToken", refreshToken, {
+    //   path: "/",
+    //   httpOnly: true,
+    //   secure: true,
+    //   sameSite: "lax",
+    //   expires: decodeRefreshToken.exp * 1000,
+    // });
+   
+    return Response.json(payload);
+  } catch (error) {
+   
+    if (error instanceof HttpError) {
+  
+      return Response.json({
+        message: error.message,
+        errors : error.payload.errors
+      }, {
+        status : error.status
+      });
+    }
+    return Response.json(
+      {
+        message: "Đã có lỗi xảy ra",
+      },
+      { status: StatusCodes.INTERNAL_SERVER_ERROR },
+    );
+  }
+}
