@@ -138,7 +138,7 @@ const request = async <Response>(
     throw new HttpError(
       data as { status: number; payload: EntityErrorPayload },
     );
-  }
+  } 
   // Đảm bảo logic dưới đây chỉ chạy ở phía client (browser)
   if (isEnviromentClient) {
     const normalizeUrl = normalizePath(url);

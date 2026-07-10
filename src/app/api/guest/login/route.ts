@@ -1,16 +1,14 @@
 import { guestApiRequest } from "@/apiRequest/guest";
 import { HttpError } from "@/lib/http";
-import { setAccesTokenToCookie, setRefreshTokenToCookie } from "@/lib/utils";
+import { setAccesTokenToCookie, setRefreshTokenToCookie } from "@/lib/utils-server";
 import { GuestLoginBodyType } from "@/modelValidation/guest.schema";
 import { TokenPayload } from "@/types/jwt.types";
 import { StatusCodes } from "http-status-codes";
 import { decode } from "jsonwebtoken";
-import { cookies } from "next/headers";
 import { NextRequest } from "next/server";
 
 export async function POST(request: NextRequest) {
   const body = (await request.json()) as GuestLoginBodyType;
-  const cookiesStore = await cookies();
   try {
     const { payload } = await guestApiRequest.login(body);
     const {
@@ -21,8 +19,8 @@ export async function POST(request: NextRequest) {
     const decodeRefreshToken = decode(refreshToken) as TokenPayload
 
     //Set cookie
-    setAccesTokenToCookie({accessToken,exp :  decodeAccessToken.exp})
-    setRefreshTokenToCookie({refreshToken,exp :decodeRefreshToken.exp})
+    await setAccesTokenToCookie({accessToken,exp :  decodeAccessToken.exp})
+    await setRefreshTokenToCookie({refreshToken,exp :decodeRefreshToken.exp})
     // cookiesStore.set("accessToken", accessToken, {
     //   path: "/",
     //   httpOnly: true,
@@ -41,11 +39,11 @@ export async function POST(request: NextRequest) {
    
     return Response.json(payload);
   } catch (error) {
-   
+    console.error(error)
     if (error instanceof HttpError) {
   
       return Response.json({
-        message: error.message,
+        message: error.payload.message,
         errors : error.payload.errors
       }, {
         status : error.status

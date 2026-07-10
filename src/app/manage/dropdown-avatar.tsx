@@ -18,7 +18,7 @@ import { useAppContext } from "@/components/app-provider";
 export default function DropdownAvatar() {
   const logoutMutaion = useLogoutMutaition();
   const {data} = useAccountMe()
-  const {setIsAuth} = useAppContext()
+  const {setRole} = useAppContext()
   const account = data?.payload.data
   const route = useRouter()
   const handleLogout = async () => {
@@ -33,7 +33,7 @@ export default function DropdownAvatar() {
       toast.error("Đang có vấn đề", {duration : 2000})
      
     }finally{
-      setIsAuth(false)
+      setRole(undefined)
     }
   };
   return (

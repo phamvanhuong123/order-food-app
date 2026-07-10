@@ -1,4 +1,5 @@
 import { authApiRequest } from "@/apiRequest/auth";
+import { setAccesTokenToCookie, setRefreshTokenToCookie } from "@/lib/utils-server";
 import { StatusCodes } from "http-status-codes";
 import { decode } from "jsonwebtoken";
 import { cookies } from "next/headers";
@@ -21,21 +22,24 @@ export async function POST(request: NextRequest) {
     const decodeAccessToken = decode(payload.data.accessToken) as {exp : number}
     const decodeRefreshToken = decode(payload.data.refreshToken) as {exp : number}
     //set cookie mới
-     cookieStore.set("accessToken", payload.data.accessToken, {
-      path: "/",
-      httpOnly: true,
-      secure: true,
-      sameSite: "lax",
-      expires: decodeAccessToken.exp * 1000,
-    });
 
-    cookieStore.set("refreshToken", payload.data.refreshToken, {
-      path: "/",
-      httpOnly: true,
-      secure: true,
-      sameSite: "lax",
-      expires: decodeRefreshToken.exp * 1000,
-    });
+    await setAccesTokenToCookie({accessToken : payload.data.accessToken,exp :  decodeAccessToken.exp})
+    await  setRefreshTokenToCookie({refreshToken : payload.data.refreshToken,exp :decodeRefreshToken.exp})
+    //  cookieStore.set("accessToken", payload.data.accessToken, {
+    //   path: "/",
+    //   httpOnly: true,
+    //   secure: true,
+    //   sameSite: "lax",
+    //   expires: decodeAccessToken.exp * 1000,
+    // });
+
+    // cookieStore.set("refreshToken", payload.data.refreshToken, {
+    //   path: "/",
+    //   httpOnly: true,
+    //   secure: true,
+    //   sameSite: "lax",
+    //   expires: decodeRefreshToken.exp * 1000,
+    // });
     return Response.json(payload);
     
   } catch (error) {

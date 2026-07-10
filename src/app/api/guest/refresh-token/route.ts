@@ -1,5 +1,5 @@
 import { guestApiRequest } from "@/apiRequest/guest";
-import { setAccesTokenToCookie, setRefreshTokenToCookie } from "@/lib/utils";
+import { setAccesTokenToCookie, setRefreshTokenToCookie } from "@/lib/utils-server";
 import { TokenPayload } from "@/types/jwt.types";
 import { StatusCodes } from "http-status-codes";
 import { decode } from "jsonwebtoken";
@@ -30,11 +30,11 @@ export async function POST(request: NextRequest) {
     ) as TokenPayload;
     //set cookie mới
 
-    setAccesTokenToCookie({
+    await setAccesTokenToCookie({
       accessToken: payload.data.accessToken,
       exp: decodeAccessToken.exp,
     });
-    setRefreshTokenToCookie({
+    await setRefreshTokenToCookie({
       refreshToken: payload.data.refreshToken,
       exp: decodeRefreshToken.exp,
     });

@@ -4,7 +4,7 @@ import z from 'zod'
 
 export const GuestLoginBody = z
   .object({
-    name: z.string().min(2).max(50),
+    name: z.string().min(2,{error : "Tối thiểu là 2 kí tự"}).max(50,{error : 'Tối đa là 50 kí tự'}),
     tableNumber: z.number(),
     token: z.string()
   })

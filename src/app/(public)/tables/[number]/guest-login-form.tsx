@@ -8,17 +8,47 @@ import { Controller, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { GuestLoginBody, GuestLoginBodyType } from '@/modelValidation/guest.schema'
 import { Field, FieldError } from '@/components/ui/field'
+import { useParams, useSearchParams } from 'next/navigation'
+import { useLoginGuestMutaition } from '@/queries/useGuest'
+import { useAppContext } from '@/components/app-provider'
+import { useRouter } from 'next/navigation'
+import { handleErrorApi } from '@/lib/utils'
+import { useEffect } from 'react'
+import { toast } from 'sonner'
 
 export default function GuestLoginForm() {
+  const searchParams = useSearchParams()
+  const loginGuestMutaion = useLoginGuestMutaition()
+  const route = useRouter()
+  const {number} = useParams()
+  const {setRole} = useAppContext()
+  const token = searchParams.get('token')
   const form = useForm<GuestLoginBodyType>({
     resolver: zodResolver(GuestLoginBody),
     defaultValues: {
       name: '',
-      token: '',
-      tableNumber: 1
+      token: token ?? '',
+      tableNumber: Number(number) || 1
     }
   })
-
+  const onSubmit = async(values : GuestLoginBodyType) => {
+    if(loginGuestMutaion.isPending) return
+    try {
+      const result = await loginGuestMutaion.mutateAsync(values)
+      setRole(result.payload.data.guest.role)
+      toast.success('Đăng nhập thành công', {duration : 2000})
+      route.push('/guest/menu')
+      
+    } catch (error) {
+      handleErrorApi({error,setError : form.setError})
+    }
+  }
+  useEffect(() => {
+    if(!token){
+      setRole(undefined)
+      route.push('/')
+    }
+  },[setRole,token,route])
   return (
     <Card className='mx-auto max-w-sm'>
       <CardHeader>
@@ -26,7 +56,7 @@ export default function GuestLoginForm() {
       </CardHeader>
       <CardContent>
   
-          <form className='space-y-2 max-w-150 shrink-0 w-full' noValidate>
+          <form className='space-y-2 max-w-150 shrink-0 w-full' noValidate onSubmit={form.handleSubmit(onSubmit)}>
             <div className='grid gap-4'>
               <Controller
                 control={form.control}

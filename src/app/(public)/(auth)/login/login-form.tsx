@@ -25,7 +25,7 @@ function LoginFormConponent() {
    const loginMutation = useLoginMutaition();
   const route = useRouter()
   const searchParams = useSearchParams()
-  const {setIsAuth} = useAppContext()
+  const {setRole} = useAppContext()
   const clearToken = searchParams.get('clearTokens')
   const form = useForm<LoginBodyType>({
     resolver: zodResolver(LoginBody),
@@ -53,8 +53,8 @@ function LoginFormConponent() {
     }
   };
   useEffect(()=>{
-    if(clearToken) setIsAuth(false)
-  },[setIsAuth,clearToken])
+    if(clearToken) setRole(undefined)
+  },[setRole,clearToken])
   return (
     <Card className="mx-auto max-w-sm w-150">
       <CardHeader>

@@ -16,7 +16,7 @@ const { mutateAsync } = useLogoutMutaition();
   const params = useSearchParams();
   const refreshTokenFormUrl = params.get("refreshToken");
   const accessTokenFormUrl = params.get("accessToken");
-  const {setIsAuth} = useAppContext()
+  const {setRole} = useAppContext()
   useEffect(() => {
     const handleLogout = async () => {
       if (
@@ -28,13 +28,13 @@ const { mutateAsync } = useLogoutMutaition();
       ref.current = mutateAsync;
       mutateAsync().then(() => {
         setTimeout(() => {
-          setIsAuth(false)
+          setRole(undefined)
           route.push("/login");
         }, 1000);
       });
     };
     handleLogout();
-  }, [mutateAsync, route, refreshTokenFormUrl,accessTokenFormUrl,setIsAuth]);
+  }, [mutateAsync, route, refreshTokenFormUrl,accessTokenFormUrl,setRole]);
 
   return <div className="w-screen h-screen flex items-center justify-center">
     <Spinner className="size-15"/>
