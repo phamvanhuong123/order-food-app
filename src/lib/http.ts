@@ -1,5 +1,11 @@
 import { envConfig } from "@/config";
-import { normalizePath } from "@/lib/utils";
+import {
+  getAccessTokenFromLocalStorage,
+  normalizePath,
+  removeTokenFromLocalStorage,
+  setAcessTokenToLocalStorage,
+  setRefreshToLocalStorage,
+} from "@/lib/utils";
 import { LoginResType } from "@/modelValidation/auth.shema";
 import { StatusCodes } from "http-status-codes";
 import { redirect } from "next/navigation";
@@ -70,7 +76,7 @@ const request = async <Response>(
           "Content-Type": "application/json",
         };
   if (isEnviromentClient) {
-    const accessToken = localStorage.getItem("accessToken");
+    const accessToken = getAccessTokenFromLocalStorage();
     if (accessToken) {
       baseHeaders.Authorization = `Bearer ${accessToken}`;
     }
@@ -121,8 +127,7 @@ const request = async <Response>(
           } catch {
           } finally {
             clientLogoutRequest = null;
-            localStorage.removeItem("accessToken");
-            localStorage.removeItem("refreshToken");
+            removeTokenFromLocalStorage();
             location.href = "/login";
           }
         }
@@ -138,21 +143,24 @@ const request = async <Response>(
     throw new HttpError(
       data as { status: number; payload: EntityErrorPayload },
     );
-  } 
+  }
   // Đảm bảo logic dưới đây chỉ chạy ở phía client (browser)
   if (isEnviromentClient) {
     const normalizeUrl = normalizePath(url);
-
-
     if (
-      ["api/auth/login", "auth/login"].some((item) => item === normalizeUrl)
+      ["api/auth/login", "api/guest/login"].some(
+        (item) => item === normalizeUrl,
+      )
     ) {
       const { accessToken, refreshToken } = (payload as LoginResType).data;
-      localStorage.setItem("accessToken", accessToken);
-      localStorage.setItem("refreshToken", refreshToken);
-    } else if ("api/auth/logout" === normalizeUrl) {
-      localStorage.removeItem("accessToken");
-      localStorage.removeItem("refreshToken");
+      setAcessTokenToLocalStorage(accessToken);
+      setRefreshToLocalStorage(refreshToken);
+    } else if (
+      ["api/auth/logout", "api/guest/logout"].some(
+        (item) => item === normalizeUrl,
+      )
+    ) {
+      removeTokenFromLocalStorage();
     }
   }
   return data;
