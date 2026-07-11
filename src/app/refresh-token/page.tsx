@@ -4,7 +4,7 @@ import { checkRefreshToken, getRefreshTokenFromLocalStorage} from "@/lib/utils";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect } from "react";
 
-const UNAUTHENTICATED_PATH = ["/login", "/logout", "/refresh-token"];
+const UNAUTHENTICATED_PATH = ["/login", "/logout"];
 
 
 function RefreshTokenComponent(){

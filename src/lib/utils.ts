@@ -1,14 +1,15 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
-import jwt, { decode } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 import { FieldValues, Path, UseFormSetError } from "react-hook-form";
 import { EntityError, HttpError } from "@/lib/http";
 import { toast } from "sonner";
 import { authApiRequest } from "@/apiRequest/auth";
-import { DishStatus, OrderStatus, TableStatus } from "@/constants/type";
+import { DishStatus, OrderStatus, Role, TableStatus } from "@/constants/type";
 import { BookX, CookingPot, HandCoins, Loader, Truck } from "lucide-react";
 import { envConfig } from "@/config";
 import { TokenPayload } from "@/types/jwt.types";
+import { guestApiRequest } from "@/apiRequest/guest";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -85,7 +86,7 @@ export const checkRefreshToken = async (params?: {
   if (!acessTokenFromUrl || !refreshTokenFromUrl) return;
 
   //decode
-  const decodeAccessToken = decode(acessTokenFromUrl) as TokenPayload
+  const decodeAccessToken = decodeToken(acessTokenFromUrl);
 
   const now = Math.round(Date.now() / 1000); // js tinh theo (ms) nên cần phải chia ra thành giây để đồng bộ với jwt
 
@@ -96,7 +97,11 @@ export const checkRefreshToken = async (params?: {
     (decodeAccessToken.exp - decodeAccessToken.iat) / 3
   ) {
     try {
-      const res = await authApiRequest.sRefreshToken();
+      const role = decodeToken(refreshTokenFromUrl).role;
+      const res =
+        role === Role.Guest
+          ? await guestApiRequest.sRefreshToken()
+          : await authApiRequest.sRefreshToken();
       const {
         payload: { data },
       } = res;
@@ -204,4 +209,3 @@ export const OrderStatusIcon = {
   [OrderStatus.Delivered]: Truck,
   [OrderStatus.Paid]: HandCoins,
 };
-

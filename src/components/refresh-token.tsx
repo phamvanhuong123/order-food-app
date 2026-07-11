@@ -10,7 +10,6 @@ const UNAUTHENTICATED_PATH = ["/login", "/logout", "/refresh-token"];
 const TIME_OUT = 1000;
 export function RefreshToken() {
   const pathName = usePathname();
-
   useEffect(() => {
     if (UNAUTHENTICATED_PATH.includes(pathName)) return;
     let interval: ReturnType<typeof setInterval> | null = null;

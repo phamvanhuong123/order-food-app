@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
     //set cookie mới
 
     await setAccesTokenToCookie({accessToken : payload.data.accessToken,exp :  decodeAccessToken.exp})
-    await  setRefreshTokenToCookie({refreshToken : payload.data.refreshToken,exp :decodeRefreshToken.exp})
+    await setRefreshTokenToCookie({refreshToken : payload.data.refreshToken,exp :decodeRefreshToken.exp})
     //  cookieStore.set("accessToken", payload.data.accessToken, {
     //   path: "/",
     //   httpOnly: true,
