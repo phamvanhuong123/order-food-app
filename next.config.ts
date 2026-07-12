@@ -11,7 +11,12 @@ const nextConfig: NextConfig = {
         pathname: '/**',
         
         
-      },
+      },{
+        protocol : 'https',
+        hostname  : 'via.placeholder.com',
+        port : '',
+        pathname : '/**'
+      }
     ],
     qualities : [75,100],
     dangerouslyAllowLocalIP : true

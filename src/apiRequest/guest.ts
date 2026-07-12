@@ -1,6 +1,6 @@
 import http from "@/lib/http";
 import { LogoutBodyType, RefreshTokenBodyType, RefreshTokenResType } from "@/modelValidation/auth.shema";
-import { GuestLoginBodyType, GuestLoginResType } from "@/modelValidation/guest.schema";
+import { GuestCreateOrdersBodyType, GuestCreateOrdersResType, GuestLoginBodyType, GuestLoginResType } from "@/modelValidation/guest.schema";
 
 const prefix = 'guest'
 
@@ -62,11 +62,20 @@ const sRefreshToken =async () => {
 };
 
 
+const createGuestOrder = (body : GuestCreateOrdersBodyType) => {
+  return http.post<GuestCreateOrdersResType>(`/${prefix}/orders`,body)
+}
+const getListGuestOrder = () => {
+  return http.get<GuestCreateOrdersResType>(`/${prefix}/orders`)
+}
+
 export const guestApiRequest = {
   login,
   sLogin,
   sLogOut,
   logOut,
   refreshToken,
-  sRefreshToken
+  sRefreshToken,
+  createGuestOrder,
+  getListGuestOrder
 }
