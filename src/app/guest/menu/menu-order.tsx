@@ -1,30 +1,43 @@
-'use client'
+"use client";
 import Image from "next/image";
-import { Minus, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { useListDish } from "@/queries/useDish";
-
-// fake data
-// const dishes = [
-//   {
-//     id: 1,
-//     name: "Pizza hải sản",
-//     description: "Pizza hải sản ngon nhất thế giới",
-//     price: 100000,
-//     image: "https://via.placeholder.com/150",
-//   },
-//   {
-//     id: 2,
-//     name: "Pizza thịt bò",
-//     description: "Pizza thịt bò ngon nhất thế giới",
-//     price: 150000,
-//     image: "https://via.placeholder.com/150",
-//   },
-// ];
+import Quantity from "@/app/guest/menu/quanlity";
+import { useMemo, useState } from "react";
+import { GuestCreateOrdersBodyType } from "@/modelValidation/guest.schema";
+import { formatCurrency } from "@/lib/utils";
 export const MenuOrder = () => {
-    const {data} = useListDish()
-    const dishes = data?.payload.data || []
+  const { data } = useListDish();
+  const dishes = useMemo(()=> {return data?.payload.data || []},[data])
+  const [orders, setOrders] = useState<GuestCreateOrdersBodyType>([]);
+
+  const handleOnChange = (dishId: number, quantity: number) => {
+    setOrders((prevOrders) => {
+    //Nếu quantity = 0 xoá khỏi danh sách
+      if (quantity === 0) {
+        return prevOrders.filter((order) => order.dishId !== dishId);
+      }
+
+      const index = prevOrders.findIndex((order) => order.dishId === dishId);
+      //Nếu chưa có thì thêm
+      if (index === -1) {
+        return [...prevOrders, { dishId: dishId, quantity: quantity }];
+      }
+      //Nếu đã có thì cật nhật quatity
+      const newOrders = [...prevOrders];
+      newOrders[index] = { ...newOrders[index], quantity };
+      return newOrders;
+    });
+  };
+  const totalPrice  = useMemo(()=>{
+    return orders.reduce((result,order) => {
+    const dish = dishes.find(dish => dish.id === order.dishId)
+     if(!dish) return result
+    const total = result + (dish.price * order.quantity)
+    return total
+
+  },0)
+  },[orders,dishes])
   return (
     <>
       {dishes.map((dish) => (
@@ -42,25 +55,22 @@ export const MenuOrder = () => {
           <div className="space-y-1">
             <h3 className="text-sm">{dish.name}</h3>
             <p className="text-xs">{dish.description}</p>
-            <p className="text-xs font-semibold">2,200,000 đ</p>
+            <p className="text-xs font-semibold">{formatCurrency(dish.price)}</p>
           </div>
           <div className="shrink-0 ml-auto flex justify-center items-center">
-            <div className="flex gap-1 ">
-              <Button className="h-6 w-6 p-0">
-                <Minus className="w-3 h-3" />
-              </Button>
-              <Input type="text" readOnly className="h-6 p-1 w-8" />
-              <Button className="h-6 w-6 p-0">
-                <Plus className="w-3 h-3" />
-              </Button>
-            </div>
+            <Quantity
+              value={
+                orders.find((order) => order.dishId == dish.id)?.quantity ?? 0
+              }
+              onChange={(value) => handleOnChange(dish.id, value)}
+            />
           </div>
         </div>
       ))}
       <div className="sticky bottom-0">
         <Button className="w-full justify-between">
-          <span>Giỏ hàng · 2 món</span>
-          <span>100,000 đ</span>
+          <span>Giỏ hàng · {orders.length} món</span>
+          <span>{totalPrice}</span>
         </Button>
       </div>
     </>
