@@ -141,15 +141,30 @@ export const getVietnameseOrderStatus = (
 ) => {
   switch (status) {
     case OrderStatus.Delivered:
-      return "Đã phục vụ";
+      return {
+        message: "Đã phục vụ",
+        cssClass: "bg-purple-50 text-purple-700 dark:bg-purple-950 dark:text-purple-300",
+      };
     case OrderStatus.Paid:
-      return "Đã thanh toán";
+      return {
+        message: "Đã thanh toán",
+        cssClass: "bg-green-50 text-green-700 dark:bg-green-950 dark:text-green-300",
+      };
     case OrderStatus.Pending:
-      return "Chờ xử lý";
+      return {
+        message: "Chờ xử lý",
+        cssClass: "bg-sky-50 text-sky-700 dark:bg-sky-950 dark:text-sky-300",
+      };
     case OrderStatus.Processing:
-      return "Đang nấu";
+      return {
+        message: "Đang nấu",
+        cssClass: "bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300",
+      };
     default:
-      return "Từ chối";
+      return {
+        message: "Từ chối",
+        cssClass: "bg-red-50 text-red-700 dark:bg-red-950 dark:text-red-300",
+      };
   }
 };
 

@@ -5,9 +5,15 @@ import { useListDish } from "@/queries/useDish";
 import Quantity from "@/app/guest/menu/quanlity";
 import { useMemo, useState } from "react";
 import { GuestCreateOrdersBodyType } from "@/modelValidation/guest.schema";
-import { formatCurrency } from "@/lib/utils";
+import { cn, formatCurrency, handleErrorApi } from "@/lib/utils";
+import { useCreateGuestOrder } from "@/queries/useGuest";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { DishStatus } from "@/constants/type";
 export const MenuOrder = () => {
   const { data } = useListDish();
+  const route = useRouter()
+  const createOrderMutation = useCreateGuestOrder()
   const dishes = useMemo(()=> {return data?.payload.data || []},[data])
   const [orders, setOrders] = useState<GuestCreateOrdersBodyType>([]);
 
@@ -29,6 +35,21 @@ export const MenuOrder = () => {
       return newOrders;
     });
   };
+
+  const handleOrderFood = async ()=> {
+    if(orders.length === 0) {
+      toast.error('Bạn chưa gọi món vui lòng thử lại', {duration : 2000})
+      return
+    }
+    if(createOrderMutation.isPending) return
+    try {
+      await createOrderMutation.mutateAsync(orders)
+      route.push('/guest/orders')
+
+    } catch (error) {
+      handleErrorApi({error})
+    }
+  }
   const totalPrice  = useMemo(()=>{
     return orders.reduce((result,order) => {
     const dish = dishes.find(dish => dish.id === order.dishId)
@@ -40,9 +61,12 @@ export const MenuOrder = () => {
   },[orders,dishes])
   return (
     <>
-      {dishes.map((dish) => (
-        <div key={dish.id} className="flex gap-4">
-          <div className="shrink-0">
+      {dishes.filter(dish => dish.status !== DishStatus.Hidden).map((dish) => (
+        <div key={dish.id} className={cn('flex gap-4',{
+            'pointer-events-none' : dish.status === DishStatus.Unavailable
+          })}>
+          <div className="shrink-0 relative">
+            {dish.status === DishStatus.Unavailable && <div className="absolute text-sm w-full h-full flex items-center justify-center">Hết hàng</div>}
             <Image
               src={dish.image}
               alt={dish.name}
@@ -68,9 +92,9 @@ export const MenuOrder = () => {
         </div>
       ))}
       <div className="sticky bottom-0">
-        <Button className="w-full justify-between">
+        <Button onClick={handleOrderFood} className="w-full justify-between">
           <span>Giỏ hàng · {orders.length} món</span>
-          <span>{totalPrice}</span>
+          <span>{formatCurrency(totalPrice)}</span>
         </Button>
       </div>
     </>
