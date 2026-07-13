@@ -1,21 +1,46 @@
 "use client";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { cn, formatCurrency, getVietnameseOrderStatus } from "@/lib/utils";
 import { useListGuestOrder } from "@/queries/useGuest";
 import { Badge } from "@/components/ui/badge";
+import { socket } from "@/lib/socket";
 export const CartOrder = () => {
   const { data } = useListGuestOrder();
-  const orders = useMemo(()=> {return data?.payload.data || []},[data])
+  const orders = useMemo(() => {
+    return data?.payload.data || [];
+  }, [data]);
 
+  const totalPrice = useMemo(() => {
+    return (
+      orders.reduce((result, order) => {
+        const price = result + order.quantity * order.dishSnapshot.price;
+        return price;
+      }, 0) || 0
+    );
+  }, [orders]);
 
-  const totalPrice = useMemo(()=> {
-    return orders.reduce((result, order) => {
-      const price = result + (order.quantity * order.dishSnapshot.price)
-      return price
-    },0) || 0
-  },[orders])
+  useEffect(() => {
+    if (socket.connected) {
+      onConnect();
+    }
+    function onConnect() {
+      console.log(socket.id);
+    }
+
+    function onDisconnect() {
+      console.log("disconnect");
+    }
+
+    socket.on("connect", onConnect);
+    socket.on("disconnect", onDisconnect);
+
+    return () => {
+      socket.off("connect", onConnect);
+      socket.off("disconnect", onDisconnect);
+    };
+  }, []);
   return (
     <>
       {orders.map((order) => (
@@ -33,13 +58,21 @@ export const CartOrder = () => {
           <div className="space-y-1">
             <h3 className="text-sm">{order.dishSnapshot.name}</h3>
             <p className="text-xs">{order.dishSnapshot.description}</p>
-            <p className="text-xs font-semibold">{formatCurrency(order.dishSnapshot.price)}</p>
+            <p className="text-xs font-semibold">
+              {formatCurrency(order.dishSnapshot.price)}
+            </p>
           </div>
           <div className="shrink-0 ml-auto flex-col justify-center">
             <div className="text-sm">Số lượng : {order.quantity}</div>
-            <Badge className={cn('text-sm',getVietnameseOrderStatus(order.status).cssClass)}>{getVietnameseOrderStatus(order.status).message}</Badge>
+            <Badge
+              className={cn(
+                "text-sm",
+                getVietnameseOrderStatus(order.status).cssClass,
+              )}
+            >
+              {getVietnameseOrderStatus(order.status).message}
+            </Badge>
           </div>
-        
         </div>
       ))}
       <div className="sticky bottom-0">
