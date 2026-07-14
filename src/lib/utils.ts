@@ -10,6 +10,7 @@ import { BookX, CookingPot, HandCoins, Loader, Truck } from "lucide-react";
 import { envConfig } from "@/config";
 import { TokenPayload } from "@/types/jwt.types";
 import { guestApiRequest } from "@/apiRequest/guest";
+import { format } from "date-fns";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -197,25 +198,25 @@ export const decodeToken = (token: string) => {
   return jwt.decode(token) as TokenPayload;
 };
 
-// export function removeAccents(str: string) {
-//   return str
-//     .normalize('NFD')
-//     .replace(/[\u0300-\u036f]/g, '')
-//     .replace(/đ/g, 'd')
-//     .replace(/Đ/g, 'D')
-// }
+export function removeAccents(str: string) {
+  return str
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/đ/g, 'd')
+    .replace(/Đ/g, 'D')
+}
 
-// export const simpleMatchText = (fullText: string, matchText: string) => {
-//   return removeAccents(fullText.toLowerCase()).includes(removeAccents(matchText.trim().toLowerCase()))
-// }
+export const simpleMatchText = (fullText: string, matchText: string) => {
+  return removeAccents(fullText.toLowerCase()).includes(removeAccents(matchText.trim().toLowerCase()))
+}
 
-// export const formatDateTimeToLocaleString = (date: string | Date) => {
-//   return format(date instanceof Date ? date : new Date(date), 'HH:mm:ss dd/MM/yyyy')
-// }
+export const formatDateTimeToLocaleString = (date: string | Date) => {
+  return format(date instanceof Date ? date : new Date(date), 'HH:mm:ss dd/MM/yyyy')
+}
 
-// export const formatDateTimeToTimeString = (date: string | Date) => {
-//   return format(date instanceof Date ? date : new Date(date), 'HH:mm:ss')
-// }
+export const formatDateTimeToTimeString = (date: string | Date) => {
+  return format(date instanceof Date ? date : new Date(date), 'HH:mm:ss')
+}
 
 export const OrderStatusIcon = {
   [OrderStatus.Pending]: Loader,
