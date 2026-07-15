@@ -22,7 +22,7 @@ export const useCreateOrderMutation = () => {
 };
 export const useUpdateOrderMutation = () => {
   return useMutation({
-    mutationFn: ({ id, ...updateBody }: UpdateOrderBodyType & { id: number }) =>
-      orderApiRequest.updateOrder(id, updateBody),
+    mutationFn: ({ orderId, ...updateBody }: UpdateOrderBodyType & { orderId: number }) =>
+      orderApiRequest.updateOrder(orderId, updateBody),
   });
 };

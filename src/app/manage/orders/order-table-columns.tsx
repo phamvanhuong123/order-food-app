@@ -17,7 +17,7 @@ import { useContext } from 'react'
 import { formatCurrency, formatDateTimeToLocaleString, getVietnameseOrderStatus, simpleMatchText } from '@/lib/utils'
 import Image from 'next/image'
 import { Badge } from '@/components/ui/badge'
-import { OrderStatus, OrderStatusValues } from '@/constants/type'
+import { OrderStatusValues } from '@/constants/type'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { OrderTableContext } from '@/app/manage/orders/order-table'
 import OrderGuestDetail from '@/app/manage/orders/order-guest-detail'
@@ -130,7 +130,6 @@ const orderTableColumns: ColumnDef<OrderItem>[] = [
           onValueChange={(value: (typeof OrderStatusValues)[number]) => {
             changeOrderStatus(value)
           }}
-          defaultValue={OrderStatus.Pending}
           value={row.getValue('status')}
         >
           <SelectTrigger className='w-35'>
@@ -165,6 +164,7 @@ const orderTableColumns: ColumnDef<OrderItem>[] = [
     )
   },
   {
+    header : 'Hành động',
     id: 'actions',
     enableHiding: false,
     cell: function Actions({ row }) {

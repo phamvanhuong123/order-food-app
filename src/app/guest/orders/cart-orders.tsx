@@ -6,8 +6,10 @@ import { cn, formatCurrency, getVietnameseOrderStatus } from "@/lib/utils";
 import { useListGuestOrder } from "@/queries/useGuest";
 import { Badge } from "@/components/ui/badge";
 import { socket } from "@/lib/socket";
+import { UpdateOrderResType } from "@/modelValidation/order.schema";
+import { toast } from "sonner";
 export const CartOrder = () => {
-  const { data } = useListGuestOrder();
+  const { data, refetch } = useListGuestOrder();
   const orders = useMemo(() => {
     return data?.payload.data || [];
   }, [data]);
@@ -32,15 +34,24 @@ export const CartOrder = () => {
     function onDisconnect() {
       console.log("disconnect");
     }
-
+    function onUpdateOrder(data: UpdateOrderResType["data"]) {
+      const { dishSnapshot, quantity } = data;
+      console.log(getVietnameseOrderStatus(data.status))
+      toast.success(
+        `Món ${dishSnapshot.name} (Số lượng : ${quantity}) vừa cật nhật sang trạng thái "${getVietnameseOrderStatus(data.status).message}" `,
+      );
+      refetch();
+    }
     socket.on("connect", onConnect);
     socket.on("disconnect", onDisconnect);
 
+    socket.on("update-order", onUpdateOrder);
     return () => {
       socket.off("connect", onConnect);
       socket.off("disconnect", onDisconnect);
+      socket.off("update-order", onUpdateOrder);
     };
-  }, []);
+  }, [refetch]);
   return (
     <>
       {orders.map((order) => (
