@@ -73,7 +73,7 @@ export default function OrderStatics({
                 const orders = selectedServingGuest[Number(guestId)]
                 return (
                   <div key={guestId}>
-                    <OrderGuestDetail guest={orders[0].guest} orders={orders} />
+                    <OrderGuestDetail guest={orders[0].guest} orders={orders} onSuccess={()=> setSelectedTableNumber(0)}/>
                     {index !== Object.keys(selectedServingGuest).length - 1 && <Separator className='my-5' />}
                   </div>
                 )

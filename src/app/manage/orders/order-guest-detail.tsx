@@ -6,19 +6,36 @@ import {
   formatCurrency,
   formatDateTimeToLocaleString,
   formatDateTimeToTimeString,
-  getVietnameseOrderStatus
+  getVietnameseOrderStatus,
+  handleErrorApi
 } from '@/lib/utils'
 import { GetOrdersResType } from '@/modelValidation/order.schema'
+import { usePayOrderMutation } from '@/queries/useOrder'
 import Image from 'next/image'
 import { Fragment } from 'react'
+import { toast } from 'sonner'
 
 type Guest = GetOrdersResType['data'][0]['guest']
 type Orders = GetOrdersResType['data']
-export default function OrderGuestDetail({ guest, orders }: { guest: Guest; orders: Orders }) {
+
+
+
+export default function OrderGuestDetail({ guest, orders,onSuccess }: { guest: Guest; orders: Orders,onSuccess? : ()=> void }) {
   const ordersFilterToPurchase = guest
     ? orders.filter((order) => order.status !== OrderStatus.Paid && order.status !== OrderStatus.Rejected)
     : []
   const purchasedOrderFilter = guest ? orders.filter((order) => order.status === OrderStatus.Paid) : []
+  const payOrderMutation = usePayOrderMutation()
+  const onPayOrder = async ()=> {
+    if(payOrderMutation.isPending || !guest) return
+    try {
+      await payOrderMutation.mutateAsync({guestId :  guest?.id})
+      toast.success(`Đã thanh toán ${orders.length} đơn hàng cho khách hàng : ${guest.name} thành công`, {duration : 2000})
+      onSuccess?.()
+    } catch (error) {
+      handleErrorApi({error})
+    }
+  }
   return (
     <div className='space-y-2 text-sm'>
       {guest && (
@@ -115,7 +132,7 @@ export default function OrderGuestDetail({ guest, orders }: { guest: Guest; orde
       </div>
 
       <div>
-        <Button className='w-full' size={'sm'} variant={'secondary'} disabled={ordersFilterToPurchase.length === 0}>
+        <Button onClick={onPayOrder} className='w-full' size={'sm'} variant={'secondary'} disabled={ordersFilterToPurchase.length === 0}>
           Thanh toán tất cả ({ordersFilterToPurchase.length} đơn)
         </Button>
       </div>

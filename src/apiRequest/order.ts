@@ -5,6 +5,8 @@ import {
   GetOrderDetailResType,
   GetOrdersQueryParamsType,
   GetOrdersResType,
+  PayGuestOrdersBodyType,
+  PayGuestOrdersResType,
   UpdateOrderBodyType,
 } from "@/modelValidation/order.schema";
 import queryString from "query-string";
@@ -23,10 +25,14 @@ const createOrder = (body: CreateOrdersBodyType) => {
 const updateOrder = (orderId: number, updateBody: UpdateOrderBodyType) => {
   return http.put(`${prefix}/${orderId}`, updateBody);
 };
+const payOrder = (body : PayGuestOrdersBodyType) => {
+  return http.post<PayGuestOrdersResType>(`${prefix}/pay`, body);
 
+}
 export const orderApiRequest = {
   getListOrder,
   createOrder,
   updateOrder,
   getDetailOrder,
+  payOrder
 };

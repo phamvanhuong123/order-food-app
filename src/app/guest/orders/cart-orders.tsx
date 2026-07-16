@@ -6,7 +6,10 @@ import { cn, formatCurrency, getVietnameseOrderStatus } from "@/lib/utils";
 import { useListGuestOrder } from "@/queries/useGuest";
 import { Badge } from "@/components/ui/badge";
 import { socket } from "@/lib/socket";
-import { UpdateOrderResType } from "@/modelValidation/order.schema";
+import {
+  PayGuestOrdersResType,
+  UpdateOrderResType,
+} from "@/modelValidation/order.schema";
 import { toast } from "sonner";
 import { OrderStatus } from "@/constants/type";
 import { GuestCreateOrdersResType } from "@/modelValidation/guest.schema";
@@ -69,14 +72,23 @@ export const CartOrder = () => {
       );
       refetch();
     }
+    function paymentOrder(data: PayGuestOrdersResType["data"]) {
+      const { guest } = data[0];
+      toast.success(
+        `Khách hàng ${guest?.name} tại bàn ${guest?.tableNumber} đã thanh toán thành công`,
+      );
+      refetch();
+    }
     socket.on("connect", onConnect);
     socket.on("disconnect", onDisconnect);
 
     socket.on("update-order", onUpdateOrder);
+    socket.on("payment", paymentOrder);
     return () => {
       socket.off("connect", onConnect);
       socket.off("disconnect", onDisconnect);
       socket.off("update-order", onUpdateOrder);
+      socket.off("payment", paymentOrder);
     };
   }, [refetch]);
   return (
