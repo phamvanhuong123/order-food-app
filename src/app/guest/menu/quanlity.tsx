@@ -4,16 +4,18 @@ import { Minus, Plus } from 'lucide-react'
 
 export default function Quantity({
   onChange,
-  value
+  value,
+  disabled
 }: {
   onChange: (value: number) => void
-  value: number
+  value: number,
+  disabled? :boolean
 }) {
   return (
     <div className='flex gap-1 '>
       <Button
         className='h-6 w-6 p-0'
-        disabled={value === 0}
+        disabled={value === 0 || disabled}
         onClick={() => onChange(value - 1)}
       >
         <Minus className='w-3 h-3' />
@@ -33,7 +35,7 @@ export default function Quantity({
           onChange(numberValue)
         }}
       />
-      <Button className='h-6 w-6 p-0' onClick={() => onChange(value + 1)}>
+      <Button disabled={disabled} className='h-6 w-6 p-0' onClick={() => onChange(value + 1)}>
         <Plus className='w-3 h-3' />
       </Button>
     </div>

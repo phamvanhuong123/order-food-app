@@ -63,10 +63,10 @@ export const MenuOrder = () => {
     <>
       {dishes.filter(dish => dish.status !== DishStatus.Hidden).map((dish) => (
         <div key={dish.id} className={cn('flex gap-4',{
-            'pointer-events-none' : dish.status === DishStatus.Unavailable
+            'cursor-not-allowed' : dish.status === DishStatus.Unavailable
           })}>
           <div className="shrink-0 relative">
-            {dish.status === DishStatus.Unavailable && <div className="absolute text-sm w-full h-full flex items-center justify-center">Hết hàng</div>}
+            {dish.status === DishStatus.Unavailable && <div  className="absolute text-sm w-full h-full flex items-center justify-center bg-black opacity-55">Hết hàng</div>}
             <Image
               src={dish.image}
               alt={dish.name}
@@ -83,10 +83,14 @@ export const MenuOrder = () => {
           </div>
           <div className="shrink-0 ml-auto flex justify-center items-center">
             <Quantity
+              disabled={dish.status === DishStatus.Unavailable}
               value={
                 orders.find((order) => order.dishId == dish.id)?.quantity ?? 0
               }
-              onChange={(value) => handleOnChange(dish.id, value)}
+              onChange={(value) => {
+                if(dish.status === DishStatus.Unavailable) return         
+                handleOnChange(dish.id, value)
+              }}
             />
           </div>
         </div>

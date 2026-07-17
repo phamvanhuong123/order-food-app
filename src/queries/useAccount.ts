@@ -1,6 +1,8 @@
 import { accountApiRequest } from "@/apiRequest/account";
 import {
   AccountIdParamType,
+  CreateGuestBodyType,
+  GetGuestListQueryParamsType,
   UpdateEmployeeAccountBodyType,
 } from "@/modelValidation/account.schema";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -15,11 +17,11 @@ export const useDetailEmployee = ({ id }: AccountIdParamType) => {
   return useQuery({
     queryKey: ["accounts", id],
     queryFn: () => accountApiRequest.getDetailAccountEmployee({ id }),
-    enabled : !!id
+    enabled: !!id,
   });
 };
 export const useCreateAccountMutation = () => {
-  const queryClient = useQueryClient()
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: accountApiRequest.createAccountEmployee,
     onSuccess: () => {
@@ -30,7 +32,7 @@ export const useCreateAccountMutation = () => {
   });
 };
 export const useUpdateAccountMutation = () => {
-  const queryClient = useQueryClient()
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({
       id,
@@ -40,20 +42,32 @@ export const useUpdateAccountMutation = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["accounts"],
-        exact : true
+        exact: true,
       });
     },
   });
 };
-
-export const useDeleteAccountMutation = ()=> {
-  const queryClient =  useQueryClient()
+export const useListGuest = (queryParams?: GetGuestListQueryParamsType) => {
+  return useQuery({
+    queryKey: ["guests", queryParams],
+    queryFn: () => accountApiRequest.listGuest(queryParams),
+  });
+};
+export const useCreateGuestMutation = () => {
   return useMutation({
-    mutationFn : ({id} : {id : number})=> accountApiRequest.deleteAccountEmployee(id),
-    onSuccess : ()=> {
+    mutationFn: (body: CreateGuestBodyType) =>
+      accountApiRequest.createGuest(body),
+  });
+};
+export const useDeleteAccountMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id }: { id: number }) =>
+      accountApiRequest.deleteAccountEmployee(id),
+    onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey : ['accounts']
-      })
-    }
-  })
-}
+        queryKey: ["accounts"],
+      });
+    },
+  });
+};

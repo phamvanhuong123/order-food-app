@@ -19,6 +19,7 @@ import { formatDateTimeToLocaleString, simpleMatchText } from '@/lib/utils'
 import { Input } from '@/components/ui/input'
 import { GetListGuestsResType } from '@/modelValidation/account.schema'
 import { endOfDay, format, startOfDay } from 'date-fns'
+import { useListGuest } from '@/queries/useAccount'
 
 type GuestItem = GetListGuestsResType['data'][0]
 
@@ -64,7 +65,8 @@ export default function GuestsDialog({ onChoose }: { onChoose: (guest: GuestItem
   const [open, setOpen] = useState(false)
   const [fromDate, setFromDate] = useState(initFromDate)
   const [toDate, setToDate] = useState(initToDate)
-  const data: GetListGuestsResType['data'] = []
+  const listGuestQuery = useListGuest({fromDate,toDate})
+  const data: GetListGuestsResType['data'] = listGuestQuery.data?.payload.data ||  []
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})

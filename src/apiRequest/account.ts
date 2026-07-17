@@ -5,10 +5,14 @@ import {
   AccountResType,
   ChangePasswordBodyType,
   CreateEmployeeAccountBodyType,
+  CreateGuestBodyType,
+  CreateGuestResType,
+  GetGuestListQueryParamsType,
+  GetListGuestsResType,
   UpdateEmployeeAccountBodyType,
   UpdateMeBodyType,
 } from "@/modelValidation/account.schema";
-
+import queryString from "query-string";
 const prefix = "/accounts";
 const me = () => {
   return http.get<AccountResType>(`${prefix}/me`);
@@ -38,13 +42,24 @@ const createAccountEmployee = (body: CreateEmployeeAccountBodyType) => {
 const getDetailAccountEmployee = ({ id }: AccountIdParamType) => {
   return http.get<AccountResType>(`${prefix}/detail/${id}`);
 };
-const updateDetailAccountEmployee = (id : number,body : UpdateEmployeeAccountBodyType) => {
-  return http.put<AccountResType>(`${prefix}/detail/${id}`,body)
-}
-const deleteAccountEmployee = (id : number) => {
-  return http.delete<AccountResType>(`${prefix}/detail/${id}`)
+const updateDetailAccountEmployee = (
+  id: number,
+  body: UpdateEmployeeAccountBodyType,
+) => {
+  return http.put<AccountResType>(`${prefix}/detail/${id}`, body);
+};
+const deleteAccountEmployee = (id: number) => {
+  return http.delete<AccountResType>(`${prefix}/detail/${id}`);
+};
 
-}
+const createGuest = (body: CreateGuestBodyType) => {
+  return http.post<CreateGuestResType>(`${prefix}/guests`, body);
+};
+const listGuest = (queryParams?: GetGuestListQueryParamsType) => {
+  return http.get<GetListGuestsResType>(
+    `${prefix}/guests?${queryString.stringify({ fromDate: queryParams?.fromDate?.toISOString(), toDate: queryParams?.toDate?.toISOString() })}`,
+  );
+};
 export const accountApiRequest = {
   me,
   sMe,
@@ -54,5 +69,7 @@ export const accountApiRequest = {
   createAccountEmployee,
   getDetailAccountEmployee,
   updateDetailAccountEmployee,
-  deleteAccountEmployee
+  deleteAccountEmployee,
+  listGuest,
+  createGuest
 };

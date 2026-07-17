@@ -177,12 +177,12 @@ export default function OrderTable() {
           `Khách hàng ${guest.guestId} tại bạn ${guest.tableNumber} đã đặt ${guest.quantity} đơn`,
         );
     }
-    socket.on("new-order", newOrder);
+    socket.on("guest-new-order", newOrder);
     socket.on("connect", onConnect);
 
     return () => {
       socket.off("connect", onConnect);
-      socket.off("new-order", newOrder);
+      socket.off("guest-new-order", newOrder);
     };
   }, [fromDate, toDate, refreshOrderList]);
   const resetDateFilter = () => {

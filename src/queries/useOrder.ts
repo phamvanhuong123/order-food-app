@@ -16,8 +16,14 @@ export const useDetailOrder = (id : number) => {
   })
 }
 export const useCreateOrderMutation = () => {
+  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: orderApiRequest.createOrder,
+    onSuccess :  ()=> {
+      queryClient.invalidateQueries({
+        queryKey : ['orders'],
+      })
+    }
   });
 };
 export const useUpdateOrderMutation = () => {
