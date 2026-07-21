@@ -1,8 +1,7 @@
 "use client";
 
-import {
-  checkRefreshToken,
-} from "@/lib/utils";
+import { socket } from "@/lib/socket";
+import { checkRefreshToken } from "@/lib/utils";
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 
@@ -14,15 +13,31 @@ export function RefreshToken() {
     if (UNAUTHENTICATED_PATH.includes(pathName)) return;
     let interval: ReturnType<typeof setInterval> | null = null;
 
-    checkRefreshToken({
-      onError: () => {
-        clearInterval(interval!);
-      },
-    });
+    const onRefreshToken = (force?: boolean) => {
+      checkRefreshToken({
+        onError: () => {
+          clearInterval(interval!);
+        },
+        force,
+      });
+    };
+    onRefreshToken();
+    interval = setInterval(onRefreshToken, TIME_OUT);
 
-    interval = setInterval(checkRefreshToken, TIME_OUT);
+    if (socket.connected) {
+      onConnect();
+    }
+    const onRefreshTokenSocket = () => {
+      onRefreshToken(true);
+    };
+    function onConnect() {
+      console.log(socket.id);
+    }
+    socket.on("connect", onConnect);
+    socket.on("refresh-token", onRefreshTokenSocket);
     return () => {
       clearInterval(interval);
+      socket.off("connect", onConnect);
     };
   }, [pathName]);
 

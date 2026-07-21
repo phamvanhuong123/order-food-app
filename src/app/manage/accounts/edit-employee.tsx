@@ -21,15 +21,27 @@ import { Controller, useForm } from "react-hook-form";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Switch } from "@/components/ui/switch";
-import { Field, FieldError } from "@/components/ui/field";
+import {
+  Field,
+  FieldContent,
+  FieldError,
+  FieldLabel,
+} from "@/components/ui/field";
 import {
   useDetailEmployee,
   useUpdateAccountMutation,
 } from "@/queries/useAccount";
 import { useUploadImage } from "@/queries/useMedia";
 import { handleErrorApi } from "@/lib/utils";
-import { number } from "zod";
 import { toast } from "sonner";
+import { Role } from "@/constants/type";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function EditEmployee({
   id,
@@ -54,6 +66,7 @@ export default function EditEmployee({
       password: undefined,
       confirmPassword: undefined,
       changePassword: false,
+      role: Role.Employee,
     },
   });
   const avatar = form.watch("avatar");
@@ -69,6 +82,7 @@ export default function EditEmployee({
   const reset = () => {
     setFile(null);
     setId(undefined);
+    form.reset()
   };
   const onSubmit = async (values: UpdateEmployeeAccountBodyType) => {
     if (updateAccountMutation.isPending || uploadloadImage.isPending) return;
@@ -96,7 +110,8 @@ export default function EditEmployee({
 
   useEffect(() => {
     if (data) {
-      const { avatar, email, name } = data.payload.data;
+      const { avatar, email, name, role } = data.payload.data;
+      const isValidRole = role === Role.Owner || role === Role.Employee;
       form.reset({
         avatar: avatar ?? undefined,
         name,
@@ -104,6 +119,7 @@ export default function EditEmployee({
         password: form.getValues("password"),
         confirmPassword: form.getValues("confirmPassword"),
         changePassword: form.getValues("changePassword"),
+        role: isValidRole ? role : Role.Employee,
       });
     }
   }, [data, form]);
@@ -113,7 +129,7 @@ export default function EditEmployee({
       open={Boolean(id)}
       onOpenChange={(value) => {
         if (!value) {
-          reset()
+          reset();
         }
       }}
     >
@@ -222,6 +238,44 @@ export default function EditEmployee({
                         <FieldError errors={[fieldState.error]} />
                       )}
                     </div>
+                  </div>
+                </Field>
+              )}
+            />
+            <Controller
+              name="role"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <div className="grid grid-cols-4 items-center justify-items-start gap-4">
+                    <FieldContent>
+                    <FieldLabel>Quyền</FieldLabel>
+
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </FieldContent>
+                  <Select
+                    name={field.name}
+                    value={field.value}
+                    onValueChange={field.onChange}
+                  >
+                    <SelectTrigger
+                      id="form-rhf-select-language"
+                      aria-invalid={fieldState.invalid}
+                      className="min-w-30"
+                    >
+                      <SelectValue placeholder="Select" />
+                    </SelectTrigger>
+                    <SelectContent position="item-aligned">
+                      <SelectItem key={Role.Owner} value={Role.Owner}>
+                        Chủ
+                      </SelectItem>
+                      <SelectItem key={Role.Employee} value={Role.Employee}>
+                        Nhân viên
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
                   </div>
                 </Field>
               )}

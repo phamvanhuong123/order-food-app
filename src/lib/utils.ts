@@ -81,6 +81,7 @@ export const removeTokenFromLocalStorage = () => {
 export const checkRefreshToken = async (params?: {
   onSuccess?: () => void;
   onError?: () => void;
+  force? : boolean
 }) => {
   const acessTokenFromUrl = getAccessTokenFromLocalStorage();
   const refreshTokenFromUrl = getRefreshTokenFromLocalStorage();
@@ -94,8 +95,9 @@ export const checkRefreshToken = async (params?: {
   //Nếu thời gian sử dụng của accesToken chỉ còn 1/3 thì refreshToken
   //ví dụ thời hạn của accessToken là 10s thì khi thời hạn accessToken còn 3s thì gọi api refreshToken
   if (
-    decodeAccessToken.exp - now <
-    (decodeAccessToken.exp - decodeAccessToken.iat) / 3
+    params?.force || 
+    (decodeAccessToken.exp - now <
+    (decodeAccessToken.exp - decodeAccessToken.iat) / 3)
   ) {
     try {
       const role = decodeToken(refreshTokenFromUrl).role;
@@ -144,12 +146,14 @@ export const getVietnameseOrderStatus = (
     case OrderStatus.Delivered:
       return {
         message: "Đã phục vụ",
-        cssClass: "bg-purple-50 text-purple-700 dark:bg-purple-950 dark:text-purple-300",
+        cssClass:
+          "bg-purple-50 text-purple-700 dark:bg-purple-950 dark:text-purple-300",
       };
     case OrderStatus.Paid:
       return {
         message: "Đã thanh toán",
-        cssClass: "bg-green-50 text-green-700 dark:bg-green-950 dark:text-green-300",
+        cssClass:
+          "bg-green-50 text-green-700 dark:bg-green-950 dark:text-green-300",
       };
     case OrderStatus.Pending:
       return {
@@ -159,7 +163,8 @@ export const getVietnameseOrderStatus = (
     case OrderStatus.Processing:
       return {
         message: "Đang nấu",
-        cssClass: "bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300",
+        cssClass:
+          "bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300",
       };
     default:
       return {
@@ -200,23 +205,28 @@ export const decodeToken = (token: string) => {
 
 export function removeAccents(str: string) {
   return str
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/đ/g, 'd')
-    .replace(/Đ/g, 'D')
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/đ/g, "d")
+    .replace(/Đ/g, "D");
 }
 
 export const simpleMatchText = (fullText: string, matchText: string) => {
-  return removeAccents(fullText.toLowerCase()).includes(removeAccents(matchText.trim().toLowerCase()))
-}
+  return removeAccents(fullText.toLowerCase()).includes(
+    removeAccents(matchText.trim().toLowerCase()),
+  );
+};
 
 export const formatDateTimeToLocaleString = (date: string | Date) => {
-  return format(date instanceof Date ? date : new Date(date), 'HH:mm:ss dd/MM/yyyy')
-}
+  return format(
+    date instanceof Date ? date : new Date(date),
+    "HH:mm:ss dd/MM/yyyy",
+  );
+};
 
 export const formatDateTimeToTimeString = (date: string | Date) => {
-  return format(date instanceof Date ? date : new Date(date), 'HH:mm:ss')
-}
+  return format(date instanceof Date ? date : new Date(date), "HH:mm:ss");
+};
 
 export const OrderStatusIcon = {
   [OrderStatus.Pending]: Loader,

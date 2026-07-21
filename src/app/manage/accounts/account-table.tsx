@@ -31,16 +31,6 @@ import AddEmployee from '@/app/manage/accounts/add-employee'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import EditEmployee from '@/app/manage/accounts/edit-employee'
 import { createContext, useContext, useEffect, useState } from 'react'
-// import {
-//   AlertDialog,
-//   AlertDialogAction,
-//   AlertDialogCancel,
-//   AlertDialogContent,
-//   AlertDialogDescription,
-//   AlertDialogFooter,
-//   AlertDialogHeader,
-//   AlertDialogTitle
-// } from '@/components/ui/alert-dialog'
 import { useSearchParams } from 'next/navigation'
 import AutoPagination from '@/components/auto-pagination'
 import { useListEmployee } from '@/queries/useAccount'
