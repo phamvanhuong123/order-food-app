@@ -38,11 +38,12 @@ function LoginFormConponent() {
   const onSubmit = async (data: LoginBodyType) => {
     if (loginMutation.isPending) return;
     try {
-      await loginMutation.mutateAsync(data);
+      const res =await loginMutation.mutateAsync(data);
       toast.success("Đăng nhập thành công", {
         duration: 2000,
        
       });
+      setRole(res.payload.data.account.role)
       route.push('/manage/dashboard')
     } catch (error) {
       handleErrorApi({

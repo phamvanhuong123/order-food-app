@@ -80,9 +80,7 @@ export const columns: ColumnDef<DishItem>[] = [
   {
     accessorKey: 'description',
     header: 'Mô tả',
-    cell: ({ row }) => (
-      <div dangerouslySetInnerHTML={{ __html: row.getValue('description') }} className='whitespace-pre-line' />
-    )
+    cell: ({ row }) => <div className='whitespace-pre-line'>{String(row.getValue('description'))}</div>
   },
   {
     accessorKey: 'status',

@@ -5,6 +5,7 @@ import type { NextRequest } from "next/server";
 
 // This function can be marked `async` if using `await` inside
 const managePath = ["/manage"];
+const employeePath = ['/manage/accounts']
 const guestPath = ["/guest"];
 const privatePath = [...managePath, ...guestPath];
 const unAuthPath = ["/login"];
@@ -38,8 +39,8 @@ export async function proxy(request: NextRequest) {
     const role = decodeToken(refreshToken).role
     const isGuestGoToManagePath = role === Role.Guest && managePath.some(path => pathname.startsWith(path))
     const isNotGuestGoToGuestPath = role !== Role.Guest && guestPath.some(path => pathname.startsWith(path))
-
-    if(isGuestGoToManagePath || isNotGuestGoToGuestPath){
+    const isNotOwnerGotoManageAccountPath = role !== Role.Owner && employeePath.some(path => pathname.startsWith(path))
+    if(isGuestGoToManagePath || isNotGuestGoToGuestPath || isNotOwnerGotoManageAccountPath){
       return NextResponse.redirect(new URL("/", request.url));
     }
   }

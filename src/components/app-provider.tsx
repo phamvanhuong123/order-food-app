@@ -29,20 +29,24 @@ export default function AppProvider({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const [isRoleState, setIsRoleState] = useState<RoleType | undefined>(()=> {
-    if(getAccessTokenFromLocalStorage()){
-      const role = decodeToken(getAccessTokenFromLocalStorage()!).role
-      return role
+  const [isRoleState, setIsRoleState] = useState<RoleType | undefined>(() => {
+    if (getAccessTokenFromLocalStorage()) {
+      const role = decodeToken(getAccessTokenFromLocalStorage()!).role;
+
+      return role;
     }
-    return undefined
+    return undefined;
   });
-      const setRole = (role?: RoleType) => {
-      setIsRoleState(role);
-      if (!role) removeTokenFromLocalStorage();
-    };
+  const setRole = (role?: RoleType) => {
+    setIsRoleState(role);
+    if (!role) removeTokenFromLocalStorage();
+  };
+
   return (
     <QueryClientProvider client={queryClient}>
-      <AppContext value={{role : isRoleState,setRole : setRole}}>{children}</AppContext>
+      <AppContext value={{ role: isRoleState, setRole: setRole }}>
+        {children}
+      </AppContext>
 
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>

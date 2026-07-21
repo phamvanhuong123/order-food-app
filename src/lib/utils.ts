@@ -70,7 +70,10 @@ export const setAcessTokenToLocalStorage = (value: string) =>
   isBrowser && localStorage.setItem("accessToken", value);
 export const setRefreshToLocalStorage = (value: string) =>
   isBrowser && localStorage.setItem("refreshToken", value);
-
+export const getRoleFromAccessToken = ()=>{
+  const accessToken = getAccessTokenFromLocalStorage() as string
+  return decodeToken(accessToken).role
+}
 export const removeTokenFromLocalStorage = () => {
   if (isBrowser) {
     localStorage.removeItem("accessToken");
