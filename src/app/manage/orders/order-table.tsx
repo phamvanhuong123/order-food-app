@@ -49,9 +49,10 @@ import { endOfDay, format, startOfDay } from "date-fns";
 import { useListOrder, useUpdateOrderMutation } from "@/queries/useOrder";
 import { useListTable } from "@/queries/useTable";
 import TableSkeleton from "@/app/manage/orders/table-skeleton";
-import { socket } from "@/lib/socket";
+
 import { GuestCreateOrdersResType } from "@/modelValidation/guest.schema";
 import { toast } from "sonner";
+import { useAppContext } from "@/components/app-provider";
 
 export const OrderTableContext = createContext({
   setOrderIdEdit: (value: number | undefined) => {},
@@ -102,7 +103,7 @@ export default function OrderTable() {
     pageIndex, // Gía trị mặc định ban đầu, không có ý nghĩa khi data được fetch bất đồng bộ
     pageSize: PAGE_SIZE, //default page size
   });
-
+  const {socket} = useAppContext()
   const { statics, orderObjectByGuestId, servingGuestByTableNumber } =
     useOrderService(orderList);
   // console.log("statics",statics)
@@ -155,11 +156,11 @@ export default function OrderTable() {
   }, [table, pageIndex]);
 
   useEffect(() => {
-    if (socket.connected) {
+    if (socket?.connected) {
       onConnect();
     }
     function onConnect() {
-      console.log(socket.id);
+      console.log(socket?.id);
     }
     function refresh() {
       const now = new Date();
@@ -177,14 +178,14 @@ export default function OrderTable() {
           `Khách hàng ${guest.guestId} tại bạn ${guest.tableNumber} đã đặt ${guest.quantity} đơn`,
         );
     }
-    socket.on("guest-new-order", newOrder);
-    socket.on("connect", onConnect);
+    socket?.on("guest-new-order", newOrder);
+    socket?.on("connect", onConnect);
 
     return () => {
-      socket.off("connect", onConnect);
-      socket.off("guest-new-order", newOrder);
+      socket?.off("connect", onConnect);
+      socket?.off("guest-new-order", newOrder);
     };
-  }, [fromDate, toDate, refreshOrderList]);
+  }, [fromDate, toDate, refreshOrderList,socket]);
   const resetDateFilter = () => {
     setFromDate(initFromDate);
     setToDate(initToDate);

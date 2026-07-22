@@ -5,7 +5,6 @@ import { useEffect, useMemo } from "react";
 import { cn, formatCurrency, getVietnameseOrderStatus } from "@/lib/utils";
 import { useListGuestOrder } from "@/queries/useGuest";
 import { Badge } from "@/components/ui/badge";
-import { socket } from "@/lib/socket";
 import {
   PayGuestOrdersResType,
   UpdateOrderResType,
@@ -15,6 +14,7 @@ import { OrderStatus } from "@/constants/type";
 import { GuestCreateOrdersResType } from "@/modelValidation/guest.schema";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { CheckCircle2Icon, InfoIcon } from "lucide-react";
+import { useAppContext } from "@/components/app-provider";
 
 const sumPrice = (data: GuestCreateOrdersResType["data"]) => {
   return (
@@ -25,6 +25,7 @@ const sumPrice = (data: GuestCreateOrdersResType["data"]) => {
   );
 };
 export const CartOrder = () => {
+  const {socket} = useAppContext()
   const { data, refetch } = useListGuestOrder();
   const orders = useMemo(() => {
     return data?.payload.data || [];
@@ -55,11 +56,11 @@ export const CartOrder = () => {
     };
   }, [orders]);
   useEffect(() => {
-    if (socket.connected) {
+    if (socket?.connected) {
       onConnect();
     }
     function onConnect() {
-      console.log(socket.id);
+      console.log(socket?.id);
     }
 
     function onDisconnect() {
@@ -79,18 +80,18 @@ export const CartOrder = () => {
       );
       refetch();
     }
-    socket.on("connect", onConnect);
-    socket.on("disconnect", onDisconnect);
+    socket?.on("connect", onConnect);
+    socket?.on("disconnect", onDisconnect);
 
-    socket.on("update-order", onUpdateOrder);
-    socket.on("payment", paymentOrder);
+    socket?.on("update-order", onUpdateOrder);
+    socket?.on("payment", paymentOrder);
     return () => {
-      socket.off("connect", onConnect);
-      socket.off("disconnect", onDisconnect);
-      socket.off("update-order", onUpdateOrder);
-      socket.off("payment", paymentOrder);
+      socket?.off("connect", onConnect);
+      socket?.off("disconnect", onDisconnect);
+      socket?.off("update-order", onUpdateOrder);
+      socket?.off("payment", paymentOrder);
     };
-  }, [refetch]);
+  }, [refetch,socket]);
   return (
     <>
       {orders.map((order) => (

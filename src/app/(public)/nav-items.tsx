@@ -44,7 +44,7 @@ const menuItems: {
 ];
 
 export default function NavItems({ className }: { className?: string }) {
-  const { role, setRole } = useAppContext();
+  const { role, setRole,disConnectSocket } = useAppContext();
   const logoutMutaion = useLogoutMutaition();
   const guestLogoutMutation = useLogoutGuestMutaition();
   const route = useRouter();
@@ -64,9 +64,9 @@ export default function NavItems({ className }: { className?: string }) {
       toast.error("Đang có vấn đề", { duration: 2000 });
     } finally {
       setRole(undefined);
+      disConnectSocket()
     }
   };
-  console.log(role);
   return (
     <>
       {menuItems.map((menu) => {

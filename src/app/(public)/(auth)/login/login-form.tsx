@@ -15,18 +15,17 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Field, FieldError } from "@/components/ui/field";
 import { useLoginMutaition } from "@/queries/useAuth";
 import { toast } from "sonner";
-import { handleErrorApi } from "@/lib/utils";
+import { generateSocketInstance, handleErrorApi } from "@/lib/utils";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect } from "react";
 import { useAppContext } from "@/components/app-provider";
 
-
 function LoginFormConponent() {
-   const loginMutation = useLoginMutaition();
-  const route = useRouter()
-  const searchParams = useSearchParams()
-  const {setRole} = useAppContext()
-  const clearToken = searchParams.get('clearTokens')
+  const loginMutation = useLoginMutaition();
+  const route = useRouter();
+  const searchParams = useSearchParams();
+  const { setRole, setSocket } = useAppContext();
+  const clearToken = searchParams.get("clearTokens");
   const form = useForm<LoginBodyType>({
     resolver: zodResolver(LoginBody),
     defaultValues: {
@@ -34,17 +33,16 @@ function LoginFormConponent() {
       password: "",
     },
   });
-
   const onSubmit = async (data: LoginBodyType) => {
     if (loginMutation.isPending) return;
     try {
-      const res =await loginMutation.mutateAsync(data);
+      const res = await loginMutation.mutateAsync(data);
       toast.success("Đăng nhập thành công", {
         duration: 2000,
-       
       });
-      setRole(res.payload.data.account.role)
-      route.push('/manage/dashboard')
+      setRole(res.payload.data.account.role);
+      setSocket(generateSocketInstance(res.payload.data.accessToken));
+      route.push("/manage/dashboard");
     } catch (error) {
       handleErrorApi({
         error,
@@ -53,9 +51,9 @@ function LoginFormConponent() {
       });
     }
   };
-  useEffect(()=>{
-    if(clearToken) setRole(undefined)
-  },[setRole,clearToken])
+  useEffect(() => {
+    if (clearToken) setRole(undefined);
+  }, [setRole, clearToken]);
   return (
     <Card className="mx-auto max-w-sm w-150">
       <CardHeader>
@@ -128,9 +126,10 @@ function LoginFormConponent() {
   );
 }
 
-
 export default function LoginForm() {
- return <Suspense>
-  <LoginFormConponent/>
- </Suspense>
+  return (
+    <Suspense>
+      <LoginFormConponent />
+    </Suspense>
+  );
 }

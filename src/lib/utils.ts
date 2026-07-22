@@ -11,6 +11,7 @@ import { envConfig } from "@/config";
 import { TokenPayload } from "@/types/jwt.types";
 import { guestApiRequest } from "@/apiRequest/guest";
 import { format } from "date-fns";
+import { io, Socket } from "socket.io-client";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -70,10 +71,10 @@ export const setAcessTokenToLocalStorage = (value: string) =>
   isBrowser && localStorage.setItem("accessToken", value);
 export const setRefreshToLocalStorage = (value: string) =>
   isBrowser && localStorage.setItem("refreshToken", value);
-export const getRoleFromAccessToken = ()=>{
-  const accessToken = getAccessTokenFromLocalStorage() as string
-  return decodeToken(accessToken).role
-}
+export const getRoleFromAccessToken = () => {
+  const accessToken = getAccessTokenFromLocalStorage() as string;
+  return decodeToken(accessToken).role;
+};
 export const removeTokenFromLocalStorage = () => {
   if (isBrowser) {
     localStorage.removeItem("accessToken");
@@ -84,7 +85,7 @@ export const removeTokenFromLocalStorage = () => {
 export const checkRefreshToken = async (params?: {
   onSuccess?: () => void;
   onError?: () => void;
-  force? : boolean
+  force?: boolean;
 }) => {
   const acessTokenFromUrl = getAccessTokenFromLocalStorage();
   const refreshTokenFromUrl = getRefreshTokenFromLocalStorage();
@@ -98,9 +99,9 @@ export const checkRefreshToken = async (params?: {
   //Nếu thời gian sử dụng của accesToken chỉ còn 1/3 thì refreshToken
   //ví dụ thời hạn của accessToken là 10s thì khi thời hạn accessToken còn 3s thì gọi api refreshToken
   if (
-    params?.force || 
-    (decodeAccessToken.exp - now <
-    (decodeAccessToken.exp - decodeAccessToken.iat) / 3)
+    params?.force ||
+    decodeAccessToken.exp - now <
+      (decodeAccessToken.exp - decodeAccessToken.iat) / 3
   ) {
     try {
       const role = decodeToken(refreshTokenFromUrl).role;
@@ -141,7 +142,29 @@ export const getVietnameseDishStatus = (
       return "Ẩn";
   }
 };
+let socketInstance: Socket | null = null;
+export const generateSocketInstance = (accessToken: string) => {
+    console.log(socketInstance)
+  if(socketInstance) return socketInstance
+  socketInstance = io(envConfig.NEXT_PUBLIC_API_ENDPOINT, {
+    auth: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+    autoConnect : true
+  });
+  console.log(socketInstance)
+  return socketInstance
+};
 
+export const disconnectSocket = () => {
+  if (!socketInstance) return;
+  try {
+    socketInstance.disconnect();
+  } catch (err) {
+    console.error('Error while disconnecting socketInstance', err);
+  }
+  socketInstance = null;
+};
 export const getVietnameseOrderStatus = (
   status: (typeof OrderStatus)[keyof typeof OrderStatus],
 ) => {
