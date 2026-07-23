@@ -46,7 +46,6 @@ export default function AppProvider({
 }>) {
   const [socket, setSocket] = useState<Socket | undefined>();
   const socketRef = useRef<Socket | undefined>(undefined);
-
   const [isRoleState, setIsRoleState] = useState<RoleType | undefined>(() => {
     if (getAccessTokenFromLocalStorage()) {
       const role = decodeToken(getAccessTokenFromLocalStorage()!).role;

@@ -6,6 +6,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import AppProvider from "@/components/app-provider";
 import AppToaster from "@/components/app-toaster";
 import { RefreshToken } from "@/components/refresh-token";
+import { ListenLogoutSocket } from "@/components/listent-logout-socket";
 
 const interSans = Inter({
   variable: "--font-inter-sans",
@@ -39,6 +40,7 @@ export default function RootLayout({
           >
             {children}
             <AppToaster />
+            <ListenLogoutSocket/>
             <RefreshToken/>
           </ThemeProvider>
         </AppProvider>
